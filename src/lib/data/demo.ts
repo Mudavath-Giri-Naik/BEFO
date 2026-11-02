@@ -2,6 +2,7 @@
  * Demo data source (VITE_DATA_SOURCE=demo, and the /demo page). Client-side fixtures that go
  * through the same UI components as real data. All places and people are fictional.
  */
+import { photo, type PhotoKey } from "@/components/site/media"
 import { tenantToday, weekday } from "@/lib/dates"
 import type { CityCount, MenuDay, MenuMeal, PlaceCard, PlaceDetail, PublicApi, PublicStats, RoomTypePublic, SearchParams, SearchResult, Suggestion } from "./types"
 
@@ -120,11 +121,19 @@ function menuFor(f: Fixture, date: string): MenuDay | null {
   return { date, meals }
 }
 
+/** Demo only: stock photos stand in for owner photos so the example listings look real. */
+const DEMO_COVERS: Record<string, PhotoKey> = {
+  "annapurna-mess": "thaliSteel", "sai-krishna-boys-hostel": "woodBunks", "sri-lakshmi-ladies-hostel": "bedWood",
+  "green-leaf-veg-mess": "thali", "harbour-view-coliving": "deskBed", "vijaya-durga-girls-hostel": "linen",
+  "amma-tiffins": "roundTray", "srinivasa-boys-pg": "bedsRow",
+}
+const cover = (slug: string) => (DEMO_COVERS[slug] ? photo(DEMO_COVERS[slug], 900, 560) : null)
+
 function toCard(f: Fixture): PlaceCard {
   return {
     slug: f.slug, name: f.name, business_type: f.business_type, city: f.city, audience: f.audience, area: f.area, headline: f.headline,
     amenities: f.amenities, veg_type: f.veg_type, min_price_paise: f.min_price_paise, beds_free: f.beds_free, availability: f.availability,
-    availability_updated_at: f.availability_updated_at, verified: f.verified, cover_path: null, lat: f.lat, lng: f.lng,
+    availability_updated_at: f.availability_updated_at, verified: f.verified, cover_path: cover(f.slug), lat: f.lat, lng: f.lng,
   }
 }
 
@@ -170,7 +179,9 @@ export const demoApi: PublicApi = {
       ? (Object.entries(f.week) as [MenuMeal["meal"], string[][]][]).flatMap(([meal, days]) => days.map((items, wd) => ({ weekday: wd, meal, items, veg_type: "veg" })))
       : []
     const { week: _w, ...rest } = f
-    return delay({ ...rest, menu_today: menuFor(f, today), menu_week: week })
+    const c = DEMO_COVERS[f.slug]
+    const photos = c ? [{ path: photo(c, 1600), alt: f.name, kind: "room" }, { path: photo("chaise", 900), alt: "Common area", kind: "common" }, { path: photo("thali", 900), alt: "Food", kind: "food" }] : []
+    return delay({ ...rest, photos, menu_today: menuFor(f, today), menu_week: week })
   },
   async stats(): Promise<PublicStats> {
     const cards = FIXTURES.map(toCard)

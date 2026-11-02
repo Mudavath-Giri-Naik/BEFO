@@ -104,7 +104,7 @@ export function AppPlace() {
 export function DemoOwner() {
   return (
     <>
-      <div className="mx-auto max-w-6xl px-4 pt-4">
+      <div data-demo-banner className="mx-auto max-w-6xl px-4 pt-4">
         <Alert><Info className="size-4" /><AlertDescription>Demo data. Try anything — nothing is saved.</AlertDescription></Alert>
       </div>
       <PlaceLoader api={demoOwnerApi} base="/demo" />

@@ -18,8 +18,8 @@ export default defineConfig({
         description: "Find hostels, PGs and messes with real seats, real menus and real prices.",
         start_url: "/",
         display: "standalone",
-        background_color: "#f7f8fb",
-        theme_color: "#26307a",
+        background_color: "#f1f1f0",
+        theme_color: "#1b1b1b",
         icons: [
           { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
           { src: "/icon-512.png", sizes: "512x512", type: "image/png" },

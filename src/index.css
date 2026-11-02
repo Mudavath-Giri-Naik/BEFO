@@ -5,88 +5,100 @@
 
 /* BEFO tokens. Colours only through these variables (CLAUDE.md rule). */
 :root {
-  --radius: 0.75rem;
-  --background: #f6f7fb;
-  --foreground: #161b33;
-  --card: #ffffff;
-  --card-foreground: #161b33;
-  --popover: #ffffff;
-  --popover-foreground: #161b33;
-  --primary: #26307a;
+  --radius: 1rem;
+  /* Calm grey paper, near-black ink, one violet accent (Stayscape-style). */
+  --background: #f1f1f0;
+  --foreground: #171717;
+  --card: #f8f8f7;
+  --card-foreground: #171717;
+  --popover: #fafaf9;
+  --popover-foreground: #171717;
+  --primary: #1b1b1b;
   --primary-foreground: #ffffff;
-  --secondary: #e9ebf5;
-  --secondary-foreground: #161b33;
-  --muted: #eef0f6;
-  --muted-foreground: #565d78;
-  --accent: #fff1c7;
-  --accent-foreground: #3d2e00;
-  --destructive: #c2362b;
-  --border: #dce0ec;
-  --input: #cfd4e4;
-  --ring: #26307a;
-  /* Domain colours */
-  --leaf: #1d7442;
-  --leaf-soft: #ddf3e5;
-  --turmeric: #e8a400;
-  --turmeric-soft: #fff1c7;
-  --ink-soft: #e4e7f6;
-  --chart-1: #26307a;
-  --chart-2: #1d7442;
-  --chart-3: #e8a400;
-  --chart-4: #c2362b;
-  --chart-5: #6b74b8;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #161b33;
-  --sidebar-primary: #26307a;
+  --secondary: #e7e7e5;
+  --secondary-foreground: #171717;
+  --muted: #e9e9e7;
+  --muted-foreground: #6a6a6a;
+  --accent: #ecebff;
+  --accent-foreground: #171717;
+  --destructive: #d23b2f;
+  --border: #dadad8;
+  --input: #d4d4d2;
+  --ring: #5b4ff0;
+  --brand: #5b4ff0;
+  --brand-strong: #4a3ee0;
+  --brand-soft: #ecebff;
+  --paper: #e9e9e7;
+  --leaf: #0f7a4f;
+  --leaf-soft: #def3e8;
+  --turmeric: #f2b705;
+  --turmeric-soft: #f5f1e6;
+  --ink-soft: #e7e7e5;
+  --footer: #1c1c1c;
+  --footer-foreground: #f2f2f1;
+  --chart-1: #1b1b1b;
+  --chart-2: #0f7a4f;
+  --chart-3: #5b4ff0;
+  --chart-4: #d23b2f;
+  --chart-5: #8a8a8a;
+  --sidebar: #f8f8f7;
+  --sidebar-foreground: #171717;
+  --sidebar-primary: #1b1b1b;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e9ebf5;
-  --sidebar-accent-foreground: #161b33;
-  --sidebar-border: #dce0ec;
-  --sidebar-ring: #26307a;
+  --sidebar-accent: #ecebff;
+  --sidebar-accent-foreground: #171717;
+  --sidebar-border: #dadad8;
+  --sidebar-ring: #5b4ff0;
 }
 
 .dark {
-  --background: #0e1328;
-  --foreground: #e8ebf7;
-  --card: #151b36;
-  --card-foreground: #e8ebf7;
-  --popover: #151b36;
-  --popover-foreground: #e8ebf7;
-  --primary: #aab4ff;
-  --primary-foreground: #10163a;
-  --secondary: #1e2547;
-  --secondary-foreground: #e8ebf7;
-  --muted: #1a2142;
-  --muted-foreground: #a2a9c6;
-  --accent: #3a2f0a;
-  --accent-foreground: #ffd866;
+  --background: #141414;
+  --foreground: #f2f2f1;
+  --card: #1c1c1c;
+  --card-foreground: #f2f2f1;
+  --popover: #1f1f1f;
+  --popover-foreground: #f2f2f1;
+  --primary: #f2f2f1;
+  --primary-foreground: #141414;
+  --secondary: #262626;
+  --secondary-foreground: #f2f2f1;
+  --muted: #232323;
+  --muted-foreground: #a3a3a3;
+  --accent: #26244a;
+  --accent-foreground: #e2e0ff;
   --destructive: #f07167;
-  --border: #283057;
-  --input: #2f3866;
-  --ring: #aab4ff;
-  --leaf: #5bd08f;
-  --leaf-soft: #133a26;
+  --border: #2e2e2e;
+  --input: #383838;
+  --ring: #8b80ff;
+  --brand: #7d72ff;
+  --brand-strong: #a39bff;
+  --brand-soft: #26244a;
+  --paper: #1c1c1c;
+  --leaf: #4ade9b;
+  --leaf-soft: #12301f;
   --turmeric: #f5c03a;
-  --turmeric-soft: #3a2f0a;
-  --ink-soft: #1e2547;
-  --chart-1: #aab4ff;
-  --chart-2: #5bd08f;
-  --chart-3: #f5c03a;
+  --turmeric-soft: #24211a;
+  --ink-soft: #232323;
+  --footer: #0e0e0e;
+  --footer-foreground: #f2f2f1;
+  --chart-1: #f2f2f1;
+  --chart-2: #4ade9b;
+  --chart-3: #8b80ff;
   --chart-4: #f07167;
-  --chart-5: #7d87d6;
-  --sidebar: #121832;
-  --sidebar-foreground: #e8ebf7;
-  --sidebar-primary: #aab4ff;
-  --sidebar-primary-foreground: #10163a;
-  --sidebar-accent: #1e2547;
-  --sidebar-accent-foreground: #e8ebf7;
-  --sidebar-border: #283057;
-  --sidebar-ring: #aab4ff;
+  --chart-5: #8a8a8a;
+  --sidebar: #1a1a1a;
+  --sidebar-foreground: #f2f2f1;
+  --sidebar-primary: #f2f2f1;
+  --sidebar-primary-foreground: #141414;
+  --sidebar-accent: #26244a;
+  --sidebar-accent-foreground: #e2e0ff;
+  --sidebar-border: #2e2e2e;
+  --sidebar-ring: #8b80ff;
 }
 
 @theme inline {
-  --font-sans: "Atkinson Hyperlegible Next", "Noto Sans Telugu", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Bricolage Grotesque Variable", "Noto Sans Telugu", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Figtree Variable", "Noto Sans Telugu", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Figtree Variable", "Noto Sans Telugu", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -109,6 +121,12 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-paper: var(--paper);
+  --color-footer: var(--footer);
+  --color-footer-foreground: var(--footer-foreground);
   --color-leaf: var(--leaf);
   --color-leaf-soft: var(--leaf-soft);
   --color-turmeric: var(--turmeric);
@@ -142,8 +160,23 @@
   }
   h1, h2, h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    font-weight: 500;
   }
+  /* soft film grain over the whole page, like printed paper */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  #root { position: relative; z-index: 1; }
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-stopped { overflow: hidden; }
   :lang(te) h1, :lang(te) h2, :lang(te) h3 {
     letter-spacing: 0;
     line-height: 1.35;
@@ -158,3 +191,8 @@
     scroll-behavior: auto !important;
   }
 }
+
+@keyframes befo-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.befo-marquee { animation: befo-marquee var(--speed, 40s) linear infinite; }
+.befo-marquee-reverse { animation-direction: reverse; }
+@media (prefers-reduced-motion: reduce) { .befo-marquee { animation: none; } }

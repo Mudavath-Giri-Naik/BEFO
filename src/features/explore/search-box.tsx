@@ -35,18 +35,18 @@ export function SearchBox({ className, defaultQ = "", defaultType = "all" }: { c
   }
 
   return (
-    <form role="search" className={cn("rounded-2xl border bg-card p-2 shadow-sm", className)}
+    <form role="search" className={cn("rounded-[28px] border bg-card p-2 shadow-[0_24px_60px_-30px_rgba(26,26,46,0.35)]", className)}
       onSubmit={(e) => { e.preventDefault(); if (active >= 0 && sugg[active]) go(sugg[active].label); else go(q) }}>
       <ToggleGroup type="single" value={type} onValueChange={(v) => v && setType(v)} className="w-full justify-start gap-1 overflow-x-auto p-1" aria-label="Type">
         {TYPES.map((x) => (
-          <ToggleGroupItem key={x.v} value={x.v} className="h-9 rounded-lg px-3 text-sm font-semibold data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">
+          <ToggleGroupItem key={x.v} value={x.v} className="h-9 rounded-full px-4 text-sm font-semibold text-muted-foreground data-[state=on]:bg-brand-soft data-[state=on]:text-brand-strong">
             {t(x.key)}
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
       <div className="relative mt-1 flex gap-2">
         <div className="relative flex-1">
-          <MapPin className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
+          <MapPin className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-brand" aria-hidden />
           <Input value={q} onChange={(e) => { setQ(e.target.value); setOpen(true); setActive(-1) }}
             onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 150)}
             onKeyDown={(e) => {
@@ -57,9 +57,9 @@ export function SearchBox({ className, defaultQ = "", defaultType = "all" }: { c
             placeholder={t("home.searchPlaceholder")} aria-label={t("home.searchPlaceholder")}
             role="combobox" aria-expanded={open && sugg.length > 0} aria-controls={listId} aria-autocomplete="list"
             aria-activedescendant={active >= 0 ? `${listId}-${active}` : undefined}
-            className="h-12 rounded-xl pl-10 text-base" enterKeyHint="search" autoComplete="off" />
+            className="h-14 rounded-full border-0 bg-muted/60 pl-12 text-base shadow-none focus-visible:bg-card" enterKeyHint="search" autoComplete="off" />
           {open && sugg.length > 0 && (
-            <ul id={listId} role="listbox" className="absolute top-full right-0 left-0 z-30 mt-1 overflow-hidden rounded-xl border bg-popover p-1 shadow-lg">
+            <ul id={listId} role="listbox" className="absolute top-full right-0 left-0 z-30 mt-2 overflow-hidden rounded-2xl border bg-popover p-1.5 shadow-xl">
               {sugg.map((s, i) => {
                 const Icon = s.kind === "city" ? Building2 : s.kind === "landmark" ? Landmark : MapPin
                 return (
@@ -75,7 +75,7 @@ export function SearchBox({ className, defaultQ = "", defaultType = "all" }: { c
             </ul>
           )}
         </div>
-        <Button type="submit" size="lg" className="h-12 rounded-xl px-5" aria-label={t("home.search")}>
+        <Button type="submit" size="lg" className="h-14 rounded-full px-6 text-base" aria-label={t("home.search")}>
           <Search className="size-5" aria-hidden /><span className="hidden sm:inline">{t("home.search")}</span>
         </Button>
       </div>

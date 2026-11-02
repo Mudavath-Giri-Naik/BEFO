@@ -58,31 +58,29 @@ export default function PlacePage() {
 
   return (
     <article className="pb-28 md:pb-12">
-      {/* header in the place's brand colour (§22.2) */}
-      <div style={{ background: swatch.bg, color: swatch.fg }}>
-        <div className="mx-auto max-w-5xl px-4 pt-6 pb-5">
-          <div className="flex flex-wrap items-center gap-2 text-sm opacity-90">
-            <span className="font-semibold">{typeLabel(t, p)}</span><span aria-hidden>·</span>
-            <span className="flex items-center gap-1"><MapPin className="size-4" aria-hidden />{p.area}, {p.city}</span>
-          </div>
-          <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">{p.name}</h1>
-          {p.headline && <p className="mt-2 max-w-[65ch] text-lg opacity-90">{p.headline}</p>}
-        </div>
-      </div>
+      {/* centred title; the place's brand colour is the dot (§22.2) */}
+      <header className="mx-auto max-w-[860px] px-5 pt-6 text-center sm:pt-10">
+        <span className="inline-flex h-10 max-w-full items-center gap-2 rounded-full border border-foreground/12 px-4 text-[14px] whitespace-nowrap text-muted-foreground sm:text-[15px]">
+          <span className="size-2.5 rounded-full" style={{ background: swatch.bg }} aria-hidden />
+          {typeLabel(t, p)}<span aria-hidden>·</span><MapPin className="size-4 shrink-0" aria-hidden /><span className="truncate">{p.area}<span className="hidden sm:inline">, {p.city}</span></span>
+        </span>
+        <h1 className="mt-5 text-[38px] leading-[1.06] tracking-[-0.035em] sm:text-[60px]">{p.name}</h1>
+        {p.headline && <p className="mx-auto mt-4 max-w-[48ch] text-[17px] leading-relaxed text-muted-foreground sm:text-[19px]">{p.headline}</p>}
+      </header>
 
       <div className="mx-auto max-w-5xl px-4">
         <Gallery p={p} />
-        <nav className="sticky top-16 z-20 -mx-4 mt-4 overflow-x-auto border-b bg-background/95 px-4 backdrop-blur" aria-label="Sections">
+        <nav className="sticky top-[84px] z-20 mt-6 overflow-x-auto rounded-full border border-foreground/12 bg-background/85 px-2 backdrop-blur-md [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Sections">
           <ul className="flex gap-1">
             {sections.map(([id, label]) => (
-              <li key={id}><a href={`#${id}`} className="flex h-12 items-center px-3 text-sm font-semibold whitespace-nowrap text-muted-foreground hover:text-foreground">{label}</a></li>
+              <li key={id}><a href={`#${id}`} className="flex h-12 items-center rounded-full px-4 text-[15px] whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground">{label}</a></li>
             ))}
           </ul>
         </nav>
 
         <div className="grid gap-10 pt-6 md:grid-cols-[1fr_300px]">
           <div className="min-w-0 space-y-12">
-            <section id="overview" className="scroll-mt-32">
+            <section id="overview" className="scroll-mt-40">
               <div className="flex flex-wrap items-center gap-3">
                 <AvailabilityBadge availability={p.availability} beds={p.beds_free} type={p.business_type} className="h-8 px-3 text-sm" />
                 {p.availability_updated_at && <span className="flex items-center gap-1 text-sm text-muted-foreground"><Clock className="size-4" aria-hidden />{t("common.updatedAgo", { ago: timeAgo(p.availability_updated_at) })}</span>}
@@ -94,7 +92,7 @@ export default function PlacePage() {
             </section>
 
             {hasRooms && (
-              <section id="rooms" className="scroll-mt-32">
+              <section id="rooms" className="scroll-mt-40">
                 <h2 className="text-2xl font-bold">{t("place.rooms")}</h2>
                 <ul className="mt-4 divide-y rounded-xl border bg-card">
                   {p.room_types.map((r) => (
@@ -122,7 +120,7 @@ export default function PlacePage() {
             )}
 
             {p.amenities.length > 0 && (
-              <section id="facilities" className="scroll-mt-32">
+              <section id="facilities" className="scroll-mt-40">
                 <h2 className="mb-4 text-2xl font-bold">{t("place.facilities")}</h2>
                 <AmenityList items={p.amenities} />
               </section>
@@ -131,7 +129,7 @@ export default function PlacePage() {
             {hasFood && <FoodSection p={p} />}
 
             {(p.rules || Object.keys(p.rules_structured).length > 0) && (
-              <section id="rules" className="scroll-mt-32">
+              <section id="rules" className="scroll-mt-40">
                 <h2 className="text-2xl font-bold">{t("place.rules")}</h2>
                 <dl className="mt-4 grid gap-3 sm:grid-cols-3">
                   {p.rules_structured.curfew && <Fact label={t("place.curfew")} value={p.rules_structured.curfew} />}
@@ -143,7 +141,7 @@ export default function PlacePage() {
             )}
 
             {p.lat != null && p.lng != null && (
-              <section id="location" className="scroll-mt-32">
+              <section id="location" className="scroll-mt-40">
                 <h2 className="text-2xl font-bold">{t("place.location")}</h2>
                 <Suspense fallback={<Skeleton className="mt-4 h-72 rounded-xl" />}>
                   <PlaceMap className="mt-4 h-72 overflow-hidden rounded-xl border" zoom={15}
@@ -163,10 +161,10 @@ export default function PlacePage() {
           </div>
 
           <aside className="hidden md:block">
-            <div className="sticky top-32 space-y-4 rounded-2xl border bg-card p-5">
+            <div className="sticky top-40 space-y-4 rounded-[28px] border border-foreground/12 bg-card p-5">
               <FromPrice paise={p.min_price_paise} className="block" />
               <AvailabilityBadge availability={p.availability} beds={p.beds_free} type={p.business_type} />
-              <Button asChild size="lg" className="h-12 w-full"><Link to={`/p/${p.slug}/join`}>{t("common.requestToJoin")}</Link></Button>
+              <Button asChild size="lg" className="h-12 w-full rounded-full"><Link to={`/p/${p.slug}/join`}>{t("common.requestToJoin")}</Link></Button>
               <ActionRow p={p} />
               {p.phone && <Button asChild variant="outline" className="h-11 w-full"><a href={`tel:${p.phone}`}><Phone className="size-4" />{formatPhone(p.phone)}</a></Button>}
             </div>
@@ -177,7 +175,7 @@ export default function PlacePage() {
       {/* mobile sticky bar */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-card/95 backdrop-blur md:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         <div className="flex items-center gap-2 px-4 py-3">
-          <Button asChild size="lg" className="h-12 flex-1"><Link to={`/p/${p.slug}/join`}>{t("common.requestToJoin")}</Link></Button>
+          <Button asChild size="lg" className="h-12 flex-1 rounded-full"><Link to={`/p/${p.slug}/join`}>{t("common.requestToJoin")}</Link></Button>
           <ActionRow p={p} compact />
         </div>
       </div>
@@ -187,9 +185,9 @@ export default function PlacePage() {
 
 function Gallery({ p }: { p: PlaceDetail }) {
   const photos = p.photos
-  if (photos.length === 0) return <div className="mt-4 aspect-[16/7] overflow-hidden rounded-2xl border"><PlaceCover type={p.business_type} /></div>
+  if (photos.length === 0) return <div className="mt-8 aspect-[4/3.2] overflow-hidden rounded-[32px] sm:aspect-[16/7]"><PlaceCover type={p.business_type} /></div>
   return (
-    <div className="mt-4 grid aspect-[16/7] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-2xl">
+    <div className="mt-8 grid aspect-[4/3.2] grid-cols-4 grid-rows-2 gap-2 overflow-hidden rounded-[32px] sm:aspect-[16/7]">
       {photos.slice(0, 5).map((ph, i) => (
         <div key={ph.path} className={cn("overflow-hidden bg-muted", i === 0 ? "col-span-4 row-span-2 sm:col-span-2" : "hidden sm:block")}>
           <PlaceCover path={ph.path} type={p.business_type} alt={ph.alt ?? ""} />
@@ -208,7 +206,7 @@ function FoodSection({ p }: { p: PlaceDetail }) {
   const today = weekday(tenantToday())
   const weekMeals = MEALS.filter((m) => p.menu_week.some((w) => w.meal === m))
   return (
-    <section id="food" className="scroll-mt-32">
+    <section id="food" className="scroll-mt-40">
       <h2 className="text-2xl font-bold">{t("place.food")}</h2>
       {p.menu_today && p.menu_today.meals.length > 0 && (
         <div className="mt-4 rounded-xl border-2 border-turmeric/60 bg-turmeric-soft/40 p-4">
@@ -270,10 +268,10 @@ function ActionRow({ p, compact }: { p: PlaceDetail; compact?: boolean }) {
   }
   return (
     <div className={cn("flex gap-2", !compact && "w-full")}>
-      <Button variant="outline" className={cn("h-12", compact ? "size-12" : "flex-1")} aria-pressed={saved} aria-label={saved ? t("common.saved") : t("common.save")} onClick={() => savedPlaces.toggle(p.slug)}>
+      <Button variant="outline" className={cn("h-12 rounded-full", compact ? "size-12" : "flex-1")} aria-pressed={saved} aria-label={saved ? t("common.saved") : t("common.save")} onClick={() => savedPlaces.toggle(p.slug)}>
         <Heart className={cn("size-5", saved && "fill-destructive text-destructive")} />{!compact && (saved ? t("common.saved") : t("common.save"))}
       </Button>
-      <Button variant="outline" className={cn("h-12", compact ? "size-12" : "flex-1")} aria-label={t("common.share")} onClick={share}>
+      <Button variant="outline" className={cn("h-12 rounded-full", compact ? "size-12" : "flex-1")} aria-label={t("common.share")} onClick={share}>
         <Share2 className="size-5" />{!compact && t("common.share")}
       </Button>
     </div>

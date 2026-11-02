@@ -24,19 +24,19 @@ export function PlaceCard({ place, index = 0, compare = true, className }: { pla
   const compared = comparePlaces.use()
   const inCompare = compared.includes(place.slug)
   return (
-    <article className={cn("group relative flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground transition-shadow hover:shadow-md focus-within:ring-[3px] focus-within:ring-ring/40", className)}>
-      <div className="relative aspect-[16/10] overflow-hidden">
+    <article className={cn("group relative flex flex-col rounded-[24px] border bg-card p-2 text-card-foreground transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-30px_rgba(26,26,46,0.45)] focus-within:ring-[3px] focus-within:ring-ring/40 motion-reduce:hover:translate-y-0", className)}>
+      <div className="relative aspect-[16/10] overflow-hidden rounded-[18px]">
         <PlaceCover path={place.cover_path} type={place.business_type} seed={index} alt={place.name} />
         <div className="absolute top-2 left-2 flex gap-1.5">
-          <Badge className="border-transparent bg-background/90 text-foreground backdrop-blur">{typeLabel(t, place)}</Badge>
+          <Badge className="h-7 rounded-full border-transparent bg-card/90 px-3 text-foreground backdrop-blur">{typeLabel(t, place)}</Badge>
         </div>
         <Button size="icon" variant="secondary" aria-pressed={saved} aria-label={saved ? t("common.saved") : t("common.save")}
           onClick={() => savedPlaces.toggle(place.slug)}
-          className="absolute top-2 right-2 size-11 rounded-full bg-background/90 backdrop-blur hover:bg-background">
+          className="absolute top-2 right-2 size-11 rounded-full bg-card/90 backdrop-blur hover:bg-card">
           <Heart className={cn("size-5", saved && "fill-destructive text-destructive")} />
         </Button>
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-4">
+      <div className="flex flex-1 flex-col gap-2 px-3 pt-4 pb-2">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-lg leading-snug font-bold">
             <Link to={`/p/${place.slug}`} className="outline-none after:absolute after:inset-0 after:content-['']">{place.name}</Link>
@@ -44,7 +44,7 @@ export function PlaceCard({ place, index = 0, compare = true, className }: { pla
           {place.verified && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <BadgeCheck className="relative z-10 mt-1 size-5 shrink-0 text-primary" aria-label={t("common.verified")} />
+                <BadgeCheck className="relative z-10 mt-1 size-5 shrink-0 text-brand" aria-label={t("common.verified")} />
               </TooltipTrigger>
               <TooltipContent>{t("place.verifiedExplain")}</TooltipContent>
             </Tooltip>
@@ -58,7 +58,7 @@ export function PlaceCard({ place, index = 0, compare = true, className }: { pla
           <AvailabilityBadge availability={place.availability} beds={place.beds_free} type={place.business_type} />
           {place.amenities.slice(0, 4).map((a) => <AmenityIcon key={a} name={a} className="text-muted-foreground" />)}
         </div>
-        <div className="mt-auto flex items-end justify-between gap-2 pt-2">
+        <div className="mt-auto flex items-end justify-between gap-2 border-t pt-3">
           <FromPrice paise={place.min_price_paise} />
           {compare && (
             <label className="relative z-10 flex min-h-11 cursor-pointer items-center gap-2 text-sm text-muted-foreground">

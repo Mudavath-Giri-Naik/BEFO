@@ -34,3 +34,11 @@ Format: date · decision · why. Anything the spec asked for that could not be v
 - **CSP** has no `'unsafe-inline'` for scripts; the theme no-flash script moved to `public/theme-init.js`.
 - **`/demo` = the real owner screens on example data** (same components, read-only). Every action shows "This is demo data. Nothing is saved."
 - **Not deployed to production:** there are no Supabase/Cloudflare accounts yet (gates G0, G2–G4). Everything is pushed to GitHub.
+
+## 2026-11-03 — redesign (owner's request: "like stayscape.framer.website")
+- **Visual language follows the Stayscape Framer template's layout and feel** (floating pill logo + round icon buttons, two-column menu card with a photo button, centred hero with location pill, black pill CTA with a round arrow, stats card, rounded photo blocks, dark photo intro with overlapping stats, pill marquees, stacking numbered photo cards, pill FAQ, dark pricing band, dark footer with big wordmark). Their photos, copy and logo are **not** used; all content is BEFO's own.
+- **Tokens:** calm grey paper (#f1f1f0) with a fixed SVG film grain, near-black ink, one violet accent (#5b4ff0) used for the open-menu state and the logo's free bed. Leaf green stays the "free beds" colour. Font: Figtree (self-hosted).
+- **Motion:** Lenis smooth scrolling for wheel/trackpad (touch keeps native momentum), fade-up + blur reveals and word-by-word headline reveals (motion/react), subtle parallax on large photos, CSS marquees, CSS sticky stacking cards. Everything turns off under `prefers-reduced-motion`.
+- **Photos:** marketing sections use Unsplash photos (Unsplash licence: free, no attribution needed), hot-linked from images.unsplash.com (added to the CSP `img-src`). In **demo mode only**, example listings also use these photos; real listings show the owner's photos or a neutral drawn cover — never a stock photo, so a place is never misrepresented.
+- **Honest social proof:** no invented ratings, reviews or customer faces. The hero stats card shows the live "beds free today" count; the avatar row shows place-type icons instead of people.
+- **Known gap:** the new home-page copy is English only for now; Telugu strings for these sections are still to be added (Phase 12). `docs/screens/*` predate the redesign and will be regenerated after deploy (the build machine can't load the photos).
