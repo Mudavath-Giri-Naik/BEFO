@@ -73,7 +73,7 @@ async function setup() {
     try {
       await c.query(readFileSync(path.join(root, f), "utf8"))
     } catch (e) {
-      throw new Error(`${f}: ${(e as Error).message}`)
+      throw new Error(`${f}: ${(e as Error).message}`, { cause: e })
     }
   }
   return c

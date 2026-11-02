@@ -1,0 +1,78 @@
+{
+  "nav": { "explore": "Explore", "hostels": "Hostels", "mess": "Mess & food", "forOwners": "For owners", "login": "Log in", "menu": "Menu", "home": "Home", "requests": "Requests", "alerts": "Alerts", "profile": "Profile" },
+  "common": {
+    "perMonth": "/mo", "from": "from", "verified": "Verified", "save": "Save", "saved": "Saved", "share": "Share", "compare": "Compare",
+    "requestToJoin": "Request to join", "seeAll": "See all", "demoData": "Demo data: these places are examples, not real listings.",
+    "updatedAgo": "Updated {{ago}}", "theme": "Theme", "light": "Light", "dark": "Dark", "system": "System", "language": "Language",
+    "loading": "Loading…", "retry": "Try again", "somethingWrong": "Something went wrong. Check your connection and try again."
+  },
+  "types": { "hostel": "Hostel", "mess": "Mess", "tiffin": "Tiffin", "pg": "PG", "other": "Place", "boys": "Boys", "girls": "Girls", "coed": "Co-living", "any": "Everyone" },
+  "availability": {
+    "free_one": "{{count}} bed free", "free_other": "{{count}} beds free",
+    "seats_one": "{{count}} seat open", "seats_other": "{{count}} seats open",
+    "full": "Full · join waitlist", "ask": "Ask owner", "none": ""
+  },
+  "home": {
+    "title": "Find a hostel or mess you can trust: real seats, real menus, real prices.",
+    "subtitle": "Every place here is run by its owner. Seats come from the owner's own room register, so “free” means free.",
+    "searchPlaceholder": "Area, college or city",
+    "search": "Search",
+    "chips": { "boys": "Boys hostel", "girls": "Girls hostel", "veg": "Veg mess", "under5k": "Under ₹5,000", "ac": "AC rooms", "near": "Near me" },
+    "live": "{{places}} places · {{beds}} beds free today",
+    "featured": "Places with free beds",
+    "menusToday": "On the menu today",
+    "why": "Why this is different",
+    "why1t": "Seats are live", "why1": "Counted from the owner's room register, with the time it was last checked.",
+    "why2t": "Menus come from the kitchen", "why2": "The mess owner updates the weekly menu. You see today's plate before you join.",
+    "why3t": "One fixed price", "why3": "Rent, deposit and food charges are shown up front. No hidden extras.",
+    "why4t": "No brokers", "why4": "You talk to the owner directly. Nobody takes a cut.",
+    "how": "How it works",
+    "how1t": "Search", "how1": "Filter by area, budget, food and facilities.",
+    "how2t": "Request", "how2": "Send a request with your move-in date. Your number is verified once.",
+    "how3t": "Move in", "how3": "The owner approves, gives you a room and your digital ID card.",
+    "areas": "Popular areas",
+    "ownerStrip": "Run a hostel or mess? Free tools for seats, menus, fees, expenses and salaries.",
+    "ownerCta": "See owner tools",
+    "faq": "Questions",
+    "q1": "Is it free for students?", "a1": "Yes. Searching, comparing and sending requests is free.",
+    "q2": "How do I know a place is real?", "a2": "Every listing is reviewed before it appears. A Verified tick means someone checked the place in person.",
+    "q3": "Why do girls' hostels hide the exact address?", "a3": "For safety. The full address and phone are shared once the owner accepts your request.",
+    "q4": "Do I pay through the app?", "a4": "No. You pay the owner directly by UPI or cash, then tap “I paid”. The owner confirms."
+  },
+  "explore": {
+    "title": "Explore places", "filters": "Filters", "results_one": "{{count}} place", "results_other": "{{count}} places",
+    "type": "Type", "audience": "For", "price": "Monthly budget", "amenities": "Facilities", "food": "Food", "veg": "Veg only", "nonveg": "Non-veg available",
+    "onlyFree": "Only places with free beds", "sort": "Sort", "sortRelevance": "Best match", "sortNearest": "Nearest", "sortPrice": "Price: low to high",
+    "sortBeds": "Most beds free", "sortRecent": "Recently updated", "list": "List", "map": "Map", "clear": "Clear all", "apply": "Show results",
+    "empty": "No places match these filters yet.", "emptyHint": "Remove a filter or search a nearby area.", "loadMore": "Show more", "all": "All"
+  },
+  "place": {
+    "overview": "Overview", "rooms": "Rooms & prices", "facilities": "Facilities", "food": "Food & menu", "rules": "Rules", "location": "Location", "photos": "Photos",
+    "deposit": "Deposit", "ac": "AC", "nonAc": "Non-AC", "attachedBath": "Attached bath", "sharedBath": "Shared bath", "bedsFree": "beds free now",
+    "requestThis": "Request this", "todaysMenu": "Today's menu", "weeklyMenu": "Weekly menu", "timings": "Meal timings", "plans": "Plans",
+    "approxLocation": "Approximate location. The exact address is shared after the owner accepts your request.",
+    "openMaps": "Open in Google Maps", "report": "Report this listing", "verifiedExplain": "Someone from our team visited and checked this place.",
+    "notFound": "This place is not available", "notFoundHint": "It may have been removed or is not public yet.", "callOwner": "Call owner",
+    "curfew": "Gate closes", "visitors": "Visitors", "notice": "Notice before leaving", "days": "{{count}} days", "closed": "Closed", "special": "Special"
+  },
+  "meals": { "breakfast": "Breakfast", "lunch": "Lunch", "snacks": "Snacks", "dinner": "Dinner" },
+  "amenity": {
+    "wifi": "Wi-Fi", "ac": "AC", "geyser": "Hot water", "laundry": "Laundry", "cctv": "CCTV", "power_backup": "Power backup", "parking": "Parking",
+    "ro_water": "RO water", "lift": "Lift", "housekeeping": "Housekeeping"
+  },
+  "owners": {
+    "title": "Run your hostel or mess in 10 minutes a week",
+    "subtitle": "Seats, menus, fees, expenses and salaries in one place. You check a short list once a week; the rest takes care of itself.",
+    "cta": "List your place free", "demo": "Try the demo", "pilot": "Free during the pilot."
+  },
+  "auth": {
+    "title": "Log in", "google": "Continue with Google", "phone": "Use phone number", "verifyTitle": "Verify your mobile",
+    "verifyHint": "We send a 6-digit code by SMS. Your number is shared only with places you ask to join.",
+    "sendCode": "Send code", "verify": "Verify", "resendIn": "Resend in {{s}}s", "resend": "Resend code", "phoneLabel": "Mobile number",
+    "codeLabel": "6-digit code", "needsBackend": "Login needs a Supabase project. This copy is running on demo data.",
+    "phoneTaken": "This number is already used with another sign-in. Log in with phone OTP, or contact support."
+  },
+  "footer": { "terms": "Terms", "privacy": "Privacy", "report": "Report a listing", "contact": "Contact", "about": "About", "help": "Help" },
+  "notFound": { "title": "Page not found", "body": "The link may be old or mistyped.", "home": "Go to home" },
+  "building": { "title": "This part is being built", "body": "It arrives in a later phase. The public site works now." }
+}
