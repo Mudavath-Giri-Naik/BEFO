@@ -11,6 +11,10 @@ const ComparePage = lazy(() => import("@/features/explore/compare"))
 const ForOwnersPage = lazy(() => import("@/features/marketing/for-owners"))
 const LoginPage = lazy(() => import("@/features/auth/login"))
 const JoinPage = lazy(() => import("@/features/customer/join"))
+const AppIndex = lazy(() => import("@/features/owner/routes").then((m) => ({ default: m.AppIndex })))
+const AppPlace = lazy(() => import("@/features/owner/routes").then((m) => ({ default: m.AppPlace })))
+const DemoOwner = lazy(() => import("@/features/owner/routes").then((m) => ({ default: m.DemoOwner })))
+const DemoIndex = lazy(() => import("@/features/owner/routes").then((m) => ({ default: m.DemoIndex })))
 
 function QrEntry() {
   const { slug } = useParams()
@@ -37,7 +41,8 @@ export const router = createBrowserRouter([
       { path: "/j/:slug", element: <QrEntry /> },
       { path: "/compare", element: <ComparePage /> },
       { path: "/for-owners", element: <ForOwnersPage /> },
-      { path: "/demo", element: <BuildingPage title="Owner demo" phase="Phase 10" /> },
+      { path: "/demo", element: <DemoIndex /> },
+      { path: "/demo/:slug/*", element: <DemoOwner /> },
       { path: "/list-your-place", element: guard(<BuildingPage title="List your place" phase="Phase 3" />) },
       { path: "/login", element: <LoginPage /> },
       { path: "/login/verify-phone", element: <LoginPage mode="verify" /> },
@@ -46,7 +51,8 @@ export const router = createBrowserRouter([
       { path: "/terms", element: <LegalPage page="terms" /> },
       { path: "/about", element: <LegalPage page="about" /> },
       { path: "/me/*", element: guard(<BuildingPage title="My places" phase="Phase 6" />) },
-      { path: "/app/*", element: guard(<BuildingPage title="Owner app" phase="Phases 3, 5, 7–9" />) },
+      { path: "/app", element: guard(<AppIndex />) },
+      { path: "/app/:slug/*", element: guard(<AppPlace />) },
       { path: "/admin/*", element: guard(<BuildingPage title="Platform admin" phase="Phase 10" />) },
       { path: "*", element: <NotFoundPage /> },
     ],

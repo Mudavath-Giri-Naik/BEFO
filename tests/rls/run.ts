@@ -176,6 +176,14 @@ async function main() {
     ok(err && /forbidden/.test(err), "manager cannot void payments")
     ok(/forbidden/.test((await fails(q, `select public.invite_staff('${T.boys}', '9876543210')`)) ?? ""), "manager cannot invite staff")
   })
+  await as(c, U.ownerMess, async (q) => {
+    const d = (await q("select public.owner_today($1) d", [T.mess])).rows[0].d
+    ok(d.claims_waiting === 1 && d.members_total === 4 && d.overdue === 2 && d.can_see_money === true && d.expense_month_paise !== null, "owner Today summary is computed")
+  })
+  await as(c, U.managerBoys, async (q) => {
+    const d = (await q("select public.owner_today($1) d", [T.boys])).rows[0].d
+    ok(d.can_see_money === false && d.expense_month_paise === null, "manager Today hides money totals")
+  })
   await as(c, U.ownerBoys, async (q) => {
     ok((await q("select count(*)::int n from public.transactions")).rows[0].n >= 2, "owner sees own transactions")
   })
@@ -212,6 +220,8 @@ async function main() {
     ]) {
       ok(/forbidden/.test((await fails(q, sql)) ?? ""), `owner A: ${label} on another tenant is forbidden`)
     }
+    ok(/forbidden/.test((await fails(q, "select public.owner_today($1)", [T.mess])) ?? ""), "owner A cannot read mess Today summary")
+    ok(/forbidden/.test((await fails(q, "select public.update_member('60000000-0000-4000-a000-000000000002', 'x')")) ?? ""), "owner A cannot edit mess members")
     const decideOther = await q("select id from public.join_requests") // cannot even see B's request
     ok(decideOther.rowCount === 0, "owner A sees no join requests of others")
   })
