@@ -7,17 +7,17 @@ Spec: `BUILD_PROMPT_v3.md`. This file tracks what is done, what is next, and the
 | Phase | Scope | Status |
 |---|---|---|
 | 0 Foundations | Vite + React 19 + TS + Tailwind v4 + shadcn/ui, theme (light/dark/system, no flash), router, i18n (en/te), brand config, PWA, `.env` + `.env.example` + `env:check` + `env:push-supabase`, `.mcp.json`, `components.json` | **Done** except Gate G1 (MCP restart) and installing an Animate UI item (registry unreachable from the build machine; see DECISIONS) |
-| 1 Database core | Tenancy, people, billing, place profile, rooms/beds, menus, join requests, claims, payments, ledger core, notifications, jobs, passkeys, SMS log; public API; RLS; seed (3 demo + 2 isolation tenants) | **Done.** `pnpm test:rls` = 510 checks green, `pnpm db:lint` green |
-| 2 Auth | Google + mandatory phone OTP, guards, `link_my_memberships`, routing by `my_context` | **UI + SQL done.** Pending: `sms-hook` Edge Function, Turnstile widget, place switcher, live test (needs G2) |
-| 3 Owner setup | `/list-your-place` wizard, presets, plans, fields, rooms, menu editor, public page editor, QR poster | SQL done (`create_tenant`, presets, `submit_for_listing`). UI next |
-| 4 Marketplace | Home, explore (filters, map, compare, saves), place page, join flow | **Public pages done on demo data + Supabase RPCs.** Pending: Pages Functions (edge cache, meta, sitemap), city pages, notifications UI, Lighthouse pass |
-| 5 Members & payments | Members table, "I paid" claims, mark paid, void, reminders, charges, import/export | SQL core done (claims, mark_paid, void, member_overview). UI next |
+| 1 Database core | Tenancy, people, billing, place profile, rooms/beds, menus, join requests, claims, payments, ledger core, notifications, jobs, passkeys, SMS log; public API; RLS; seed (3 demo + 2 isolation tenants) | **Done.** `pnpm test:rls` = 517 checks green, `pnpm db:lint` green |
+| 2 Auth | Google + mandatory phone OTP, guards, `link_my_memberships`, routing by `my_context` | **UI + SQL + `sms-hook` Edge Function done** (signature check, 3/hour · 10/day · daily cap, console/MSG91 drivers), place switcher done. Pending: Turnstile widget, live test (needs G2/G3) |
+| 3 Owner setup | `/list-your-place` wizard, presets, plans, fields, rooms, menu editor, public page editor, QR poster | **Wizard done** (3 steps → `create_tenant`). Next: rooms/floors editor, menu editor, public page editor with photos + pin, QR poster, `create-tenant` script |
+| 4 Marketplace | Home, explore (filters, map, compare, saves), place page, join flow | **Public pages + join flow done.** Pages Functions written (edge-cached `/api/explore`, `/api/place/:slug`, `/p/:slug` meta/OG/JSON-LD, `/sitemap.xml`) — untested until G4. Pending: notifications UI + push/email, Lighthouse pass |
+| 5 Members & payments | Members table, "I paid" claims, mark paid, void, reminders, charges, import/export | **Owner Today / Inbox / Members (mark paid, WhatsApp reminder, add member, confirm/ask/reject claims, approve/waitlist/reject requests) done**, also as read-only `/demo`. Next: customer "I paid" screen, void/extend/pause UI, charges, Excel import/export |
 | 6 Customer app & card | `/me`, profile form, selfie, passkey card | Tables ready (passkeys, challenges, unlocks). Not started |
 | 7 Team | Employees, absences, payouts | `computePayout` + tests done. Tables/UI not started |
 | 8 Smart Capture | captures, AI worker, drafts, payables | Not started (ledger core + dedupe/category helpers done) |
 | 9 Finance intelligence | P&L, Money Map, forecast, statements, Weekly Close | P&L definitions + summary table done. Rest not started |
-| 10 Platform & pitch | Admin console, `/for-owners`, `/demo`, legal | `/for-owners` (with leak calculator) and draft legal pages done; admin SQL (moderation, status) done |
-| 11 Backups & security | Backup workflow, CSP, restore tests | Not started |
+| 10 Platform & pitch | Admin console, `/for-owners`, `/demo`, legal | `/for-owners` (leak calculator), `/demo` (owner app on example data, mess/boys/girls switch) and draft legal pages done; admin SQL done. Pending: admin console UI, book-vs-us animation |
+| 11 Backups & security | Backup workflow, CSP, restore tests | `_headers` with CSP/HSTS/Permissions-Policy done. Backup workflow + restore tests not started |
 | 12 Polish | Motion, Telugu, PWA, a11y, perf | Telugu strings for public site done. Perf budget currently exceeded (see below) |
 | 13 Deploy & pilot | Cloudflare + prod Supabase | Blocked on gates G0, G2–G7 |
 

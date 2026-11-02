@@ -293,6 +293,14 @@ async function main() {
     ok(/forbidden/.test((await fails(q, "select public.admin_set_tenant_status($1, 'active')", [T.a])) ?? ""), "only admins change tenant status")
   })
 
+  // ── 12a. SMS limits: the 4th code in an hour is blocked (spec e2e 15)
+  await c.query("begin")
+  for (let i = 0; i < 3; i++) await c.query("select public.sms_record('+919876500000', 'console', 'console')")
+  ok((await c.query("select public.sms_allowed('9876500000') v")).rows[0].v === "blocked_rate", "4th SMS in an hour is blocked")
+  ok((await c.query("select public.sms_allowed('+919876500001') v")).rows[0].v === "ok", "other numbers are not affected")
+  ok((await c.query("select count(*)::int n from public.sms_log where phone_masked like '%•••%' and phone_hash <> '+919876500000'")).rows[0].n === 3, "SMS log stores only hashed + masked numbers")
+  await c.query("rollback")
+
   // ── 12. ledger is append-only even for the database owner
   ok(/ledger_append_only/.test(await c.query("delete from public.transactions where true").then(() => "", (e) => e.message)), "transactions cannot be deleted")
 

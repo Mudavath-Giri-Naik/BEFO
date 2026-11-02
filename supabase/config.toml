@@ -1,0 +1,28 @@
+# Local Supabase (supabase start). Hosted projects are configured in the dashboard (docs/SETUP.md).
+project_id = "befo"
+
+[api]
+schemas = ["public"]
+
+[db]
+major_version = 16
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed/seed.sql"]
+
+[auth]
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173/**"]
+
+[auth.sms]
+enable_signup = true
+enable_confirmations = true
+
+[auth.hook.send_sms]
+enabled = true
+uri = "http://host.docker.internal:54321/functions/v1/sms-hook"
+secrets = "env(SEND_SMS_HOOK_SECRET)"
+
+[functions.sms-hook]
+verify_jwt = false

@@ -26,3 +26,11 @@ Format: date · decision · why. Anything the spec asked for that could not be v
 - **Advance recovery** is capped at the month's pay; the remainder is carried (reported as `advance_carried_paise`). Net pay never goes below zero.
 - **OSM tiles:** default `tile.openstreetmap.org` per spec, acceptable only for low traffic; the OSM tile usage policy requires a valid Referer/attribution and forbids heavy use. Attribution is shown on every map. Switch `VITE_MAP_TILE_URL` to a paid/own tile provider before real traffic. **UNVERIFIED** (policy page not reachable from build machine; based on the published policy at operations.osmfoundation.org/policies/tiles).
 - **Local test database:** CI and local isolation tests run on Postgres 16 + PostGIS with `tests/rls/supabase-stub.sql` standing in for Supabase's `auth`/`storage` schemas and roles.
+
+## 2026-11-03 (overnight, owner asleep — no questions asked)
+- **MSG91 driver uses the OTP API v5** (`POST control.msg91.com/api/v5/otp?template_id&mobile&otp`, header `authkey`), passing Supabase's OTP through. **UNVERIFIED** against MSG91's current docs (their site was not reachable from the build machine). Check at Gate G3; the request builder is isolated in `supabase/functions/_shared/sms.ts` and unit-tested.
+- **Console SMS on hosted projects is refused** unless `ALLOW_CONSOLE_SMS_IN_PROD=1` (set it only on the dev project), so OTPs can never leak into prod logs by mistake.
+- **Pages Functions** are written but not run (no Cloudflare account yet). Verify after Gate G4 with `wrangler pages dev dist`.
+- **CSP** has no `'unsafe-inline'` for scripts; the theme no-flash script moved to `public/theme-init.js`.
+- **`/demo` = the real owner screens on example data** (same components, read-only). Every action shows "This is demo data. Nothing is saved."
+- **Not deployed to production:** there are no Supabase/Cloudflare accounts yet (gates G0, G2–G4). Everything is pushed to GitHub.

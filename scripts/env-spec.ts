@@ -76,6 +76,8 @@ export const ENV: EnvKey[] = [
             "Click Generate secret → copy the WHOLE value (looks like v1,whsec_abc...) here — the function strips the prefix itself", "Enable the hook. Also enable the Phone provider (Authentication → Sign In / Providers → Phone)."] },
   { key: "SMS_DRIVER", group: "B", need: "dev", devDefault: "console", server: true, validate: (v) => (["console", "msg91"].includes(v) ? null : "use console or msg91"),
     steps: ["\"console\" prints the OTP in the function logs (dev only). \"msg91\" sends real SMS."] },
+  { key: "ALLOW_CONSOLE_SMS_IN_PROD", group: "B", need: "optional", server: true,
+    steps: ["Only for your hosted DEV project: set to 1 to let SMS_DRIVER=console print OTPs to function logs there. Never set on prod."] },
   { key: "SMS_DAILY_CAP", group: "B", need: "dev", devDefault: "300", server: true, validate: int, steps: ["Max SMS the whole platform may send per day (cost safety)."] },
   { key: "MSG91_AUTH_KEY", group: "B", need: "feature", feature: "real SMS", server: true, docs: "https://docs.msg91.com/",
     steps: ["msg91.com → sign up and finish KYC", "Register on a DLT portal (Jio / Airtel / Vi / BSNL): entity → sender ID (6 letters, matches your brand) → OTP content template",
