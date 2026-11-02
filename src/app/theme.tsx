@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
 
 export type Theme = "light" | "dark" | "system"
-const KEY = "befo-theme" // keep in sync with the inline script in index.html
+const KEY = "befo-theme" // keep in sync with public/theme-init.js
 
 interface ThemeCtx { theme: Theme; resolved: "light" | "dark"; setTheme: (t: Theme) => void }
 const Ctx = createContext<ThemeCtx | null>(null)

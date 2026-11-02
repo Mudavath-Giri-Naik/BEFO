@@ -11,6 +11,7 @@ const ComparePage = lazy(() => import("@/features/explore/compare"))
 const ForOwnersPage = lazy(() => import("@/features/marketing/for-owners"))
 const LoginPage = lazy(() => import("@/features/auth/login"))
 const JoinPage = lazy(() => import("@/features/customer/join"))
+const ListYourPlace = lazy(() => import("@/features/onboarding-owner/wizard"))
 const AppIndex = lazy(() => import("@/features/owner/routes").then((m) => ({ default: m.AppIndex })))
 const AppPlace = lazy(() => import("@/features/owner/routes").then((m) => ({ default: m.AppPlace })))
 const DemoOwner = lazy(() => import("@/features/owner/routes").then((m) => ({ default: m.DemoOwner })))
@@ -43,7 +44,7 @@ export const router = createBrowserRouter([
       { path: "/for-owners", element: <ForOwnersPage /> },
       { path: "/demo", element: <DemoIndex /> },
       { path: "/demo/:slug/*", element: <DemoOwner /> },
-      { path: "/list-your-place", element: guard(<BuildingPage title="List your place" phase="Phase 3" />) },
+      { path: "/list-your-place", element: guard(<ListYourPlace />) },
       { path: "/login", element: <LoginPage /> },
       { path: "/login/verify-phone", element: <LoginPage mode="verify" /> },
       { path: "/help", element: <LegalPage page="help" /> },
