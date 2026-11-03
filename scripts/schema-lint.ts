@@ -10,7 +10,7 @@
 import pg from "pg"
 
 const NO_POLICY_TABLES = new Set(["system_events", "rate_limits", "member_unique_values", "jobs", "webauthn_challenges", "sms_log"])
-const PUBLIC_DEFINER_VIEWS = new Set(["public_place_cards"])
+const PUBLIC_DEFINER_VIEWS = new Set<string>()
 const MONEY_WORDS = /(amount|price|cost|fee|salary|wage|balance|deposit|paid|gross|net|income|expense|investment|rate)(_|$)/
 
 async function main() {

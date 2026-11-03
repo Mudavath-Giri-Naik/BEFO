@@ -126,8 +126,9 @@ async function main() {
       const err = await fails(q, `select 1 from public.${t} limit 1`)
       ok(err && /permission denied/.test(err), `anon cannot read ${t}`)
     }
-    const cards = await q<{ slug: string }>("select slug from public.public_place_cards order by slug")
-    ok(cards.rows.map((r) => r.slug).join() === "annapurna-mess,sai-krishna-boys-hostel,sri-lakshmi-ladies-hostel", "anon sees only approved listed places")
+    ok(/permission denied/.test((await fails(q, "select 1 from public.public_place_cards")) ?? ""), "anon cannot read the cards view directly")
+    const cards = await q<{ path: string }>("select path from public.public_sitemap() where path like '/p/%' order by path")
+    ok(cards.rows.map((r) => r.path).join() === "/p/annapurna-mess,/p/sai-krishna-boys-hostel,/p/sri-lakshmi-ladies-hostel", "anon sees only approved listed places")
     ok((await q("select public.public_place_detail('other-b') d")).rows[0].d === null, "pending place has no public page")
     ok((await q("select public.public_place_detail('other-a') d")).rows[0].d === null, "draft/private place has no public page")
     const girls = (await q("select public.public_place_detail('sri-lakshmi-ladies-hostel') d")).rows[0].d
@@ -257,11 +258,11 @@ async function main() {
     ok((await q("select public.my_place_private_details('sri-lakshmi-ladies-hostel') d")).rows[0].d === null, "exact address hidden before approval")
   })
   await as(c, U.managerBoys, async (q) => {
-    const before = (await q("select beds_free from public.public_place_cards where slug = 'sai-krishna-boys-hostel'")).rows[0].beds_free
+    const before = (await q("select (public.public_place_detail('sai-krishna-boys-hostel')->>'beds_free')::int beds_free")).rows[0].beds_free
     const rid = (await q("select id from public.join_requests where status = 'pending' limit 1")).rows[0].id
     const r = (await q("select public.decide_join_request($1, 'approve', null, null, '50000000-0000-4000-a000-000000000004', 'B') r", [rid])).rows[0].r
     ok(r.status === "approve" && r.member_id, "manager approves a join request with a bed")
-    const after = (await q("select beds_free from public.public_place_cards where slug = 'sai-krishna-boys-hostel'")).rows[0].beds_free
+    const after = (await q("select (public.public_place_detail('sai-krishna-boys-hostel')->>'beds_free')::int beds_free")).rows[0].beds_free
     ok(after === before - 1, "public availability updates after bed assignment")
   })
   await as(c, U.ownerMess, async (q) => {
@@ -287,7 +288,7 @@ async function main() {
   // ── 11. suspended tenant disappears and stops working
   await as(c, U.admin, async (q) => {
     await q(`select public.admin_set_tenant_status('${T.boys}', 'suspended')`)
-    ok((await q("select count(*)::int n from public.public_place_cards where slug = 'sai-krishna-boys-hostel'")).rows[0].n === 0, "suspended place leaves search")
+    ok((await q("select count(*)::int n from public.public_sitemap() where path = '/p/sai-krishna-boys-hostel'")).rows[0].n === 0, "suspended place leaves search")
   })
   await as(c, U.ownerA, async (q) => {
     ok(/forbidden/.test((await fails(q, "select public.admin_set_tenant_status($1, 'active')", [T.a])) ?? ""), "only admins change tenant status")

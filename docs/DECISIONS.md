@@ -48,3 +48,20 @@ The owner deploys on Vercel, so `api/*.ts` (Edge Functions) + `vercel.json` (rew
 mirror the Cloudflare Pages Functions in `functions/` (kept so either host works). `/p/:slug` gets its meta tags
 by string replacement on the shell instead of HTMLRewriter. Edge responses are cached by the Vercel CDN via
 `s-maxage`. The functions fall back to the `VITE_` variables so one set of env vars is enough.
+
+## 2026-11-03 — Hosted Supabase (project `jplbjlfxrklvznmmrskh`, Postgres 17, eu-central-1)
+- **Migrations are applied with `pnpm db:migrate`** (new). The Supabase MCP server could not be authorised from the
+  desktop session, and the direct DB host is IPv6-only, so the script uses `SUPABASE_DB_URL` (session pooler) or,
+  with `--api`, the Management API SQL endpoint (`SUPABASE_ACCESS_TOKEN`). Each migration is one request = one
+  implicit transaction (verified: a failing request leaves nothing behind). Rows go into
+  `supabase_migrations.schema_migrations`, so the Supabase CLI/MCP see the same history. The seed is never run there.
+- **All 9 migrations applied unchanged** — nothing in them needed a hosted-specific fix (extensions in `extensions`,
+  pg_cron 1.6.4, the `auth.users` trigger, storage buckets + policies all went in as written).
+- **Advisor fixes (0010):** `public_place_cards` is now `security_invoker` and not granted to anon/authenticated
+  (it was the only ERROR; only definer functions read it, where it runs as the owner). The 11 `auth_rls_initplan`
+  policies use `(select auth.uid())`.
+- **Accepted advisor warnings:** `anon/authenticated_security_definer_function_executable` — these functions *are*
+  the API (CLAUDE.md: writes go through definer functions that check role + tenant); the RLS helpers (`is_owner`,
+  `can_see_money`, …) only answer about the caller. `rls_enabled_no_policy` (6 tables) is the deliberate
+  service-role-only list. Performance INFOs (unindexed FKs, unused indexes on an empty DB) and
+  `multiple_permissive_policies` (read policy + owner `for all` write policy) are left until there is real traffic.
