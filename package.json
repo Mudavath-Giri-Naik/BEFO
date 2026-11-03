@@ -24,7 +24,8 @@
     "admin:add": "tsx scripts/add-platform-admin.ts",
     "env:example": "tsx scripts/env-write.ts",
     "test:all": "pnpm typecheck && pnpm lint && pnpm test && pnpm test:rls && pnpm db:lint",
-    "screens": "tsx tests/e2e/screens.ts"
+    "screens": "tsx tests/e2e/screens.ts",
+    "build:artifact": "tsx scripts/build-artifact.ts"
   },
   "dependencies": {
     "@fontsource-variable/figtree": "^5.3.0",

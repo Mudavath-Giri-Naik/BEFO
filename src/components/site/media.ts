@@ -1,3 +1,5 @@
+import { sceneUrl, type SceneKind } from "./scenes"
+
 /**
  * Marketing photos (Unsplash licence: free to use, no attribution required). Loaded by the visitor's
  * browser straight from images.unsplash.com (allowed in the CSP). Owners' own photos replace these on
@@ -21,9 +23,19 @@ export const PHOTOS = {
 } as const
 export type PhotoKey = keyof typeof PHOTOS
 
+/** Self-contained preview build: no outside images allowed, so photos become drawn scenes. */
+export const IS_ARTIFACT = import.meta.env.VITE_ARTIFACT === "1"
+const SCENE_FOR: Record<PhotoKey, [SceneKind, number]> = {
+  bunks: ["bunks", 0], woodBunks: ["bunks", 1], brightRoom: ["room", 0], bedWood: ["room", 1], deskBed: ["desk", 0],
+  bedsRow: ["bunks", 2], linen: ["room", 2], blueBed: ["room", 3], loveseat: ["lounge", 0], livingRoom: ["lounge", 1],
+  chaise: ["lounge", 2], thaliSteel: ["thali", 0], thali: ["thali", 1], roundTray: ["thali", 2],
+}
+
 export function photo(key: PhotoKey, w = 1200, h?: number) {
+  if (IS_ARTIFACT) return sceneUrl(...SCENE_FOR[key])
   return `https://images.unsplash.com/photo-${PHOTOS[key]}?auto=format&fit=crop&q=70&w=${w}${h ? `&h=${h}` : ""}`
 }
-export function photoSet(key: PhotoKey, widths = [480, 800, 1200, 1800]) {
+export function photoSet(key: PhotoKey, widths = [480, 800, 1200, 1800]): string | undefined {
+  if (IS_ARTIFACT) return undefined
   return widths.map((w) => `${photo(key, w)} ${w}w`).join(", ")
 }

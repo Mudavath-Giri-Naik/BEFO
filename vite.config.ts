@@ -4,11 +4,13 @@ import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 import { VitePWA } from "vite-plugin-pwa"
 
+const ARTIFACT = process.env.VITE_ARTIFACT === "1"
+
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    VitePWA({
+    !ARTIFACT && VitePWA({
       registerType: "prompt",
       injectRegister: false,
       includeAssets: ["favicon.svg", "apple-touch-icon.png", "robots.txt"],
@@ -32,8 +34,20 @@ export default defineConfig({
       },
     }),
   ],
-  resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
-  build: {
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "./src"),
+      ...(ARTIFACT ? { "virtual:pwa-register": path.resolve(import.meta.dirname, "./src/app/pwa-stub.ts") } : {}),
+    },
+  },
+  // VITE_ARTIFACT=1 → one self-contained file for the preview (scripts/build-artifact.ts inlines it)
+  build: ARTIFACT ? {
+    outDir: "dist-artifact",
+    assetsInlineLimit: 100_000_000,
+    cssCodeSplit: false,
+    modulePreload: false,
+    rolldownOptions: { output: { codeSplitting: false } },
+  } : {
     rolldownOptions: {
       output: {
         manualChunks(id) {

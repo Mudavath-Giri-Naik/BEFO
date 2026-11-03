@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { Hammer, Info } from "lucide-react"
-import { Link, Navigate, Route, Routes, useNavigate, useParams } from "react-router"
+import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -47,9 +47,10 @@ function OwnerShellWithSwitcher() {
 function PlaceSwitcher() {
   const nav = useNavigate()
   const { slug } = useParams()
-  const ctx = useQuery({ queryKey: ["owner-places", isDemoPath()], queryFn: () => (isDemoPath() ? demoOwnerApi : supabaseOwnerApi).places() })
+  const demo = useLocation().pathname.startsWith("/demo")
+  const ctx = useQuery({ queryKey: ["owner-places", demo], queryFn: () => (demo ? demoOwnerApi : supabaseOwnerApi).places() })
   if (!ctx.data || ctx.data.length < 2) return null
-  const base = isDemoPath() ? "/demo" : "/app"
+  const base = demo ? "/demo" : "/app"
   return (
     <Select value={slug} onValueChange={(v) => nav(`${base}/${v}`)}>
       <SelectTrigger className="mt-2 h-10 w-full" aria-label="Switch place"><SelectValue /></SelectTrigger>
@@ -57,7 +58,6 @@ function PlaceSwitcher() {
     </Select>
   )
 }
-const isDemoPath = () => location.pathname.startsWith("/demo")
 
 function PlaceLoader({ api, base }: { api: OwnerApi; base: string }) {
   const { slug } = useParams()

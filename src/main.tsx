@@ -33,5 +33,5 @@ if (envErrors.length) {
       </Providers>
     </StrictMode>,
   )
-  registerServiceWorker()
+  if (import.meta.env.VITE_ARTIFACT !== "1") registerServiceWorker()
 }

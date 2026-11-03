@@ -1,5 +1,5 @@
 import { lazy } from "react"
-import { createBrowserRouter, Navigate, useParams, useSearchParams } from "react-router"
+import { createBrowserRouter, createMemoryRouter, Navigate, useParams, useSearchParams, type RouteObject } from "react-router"
 import { PublicLayout } from "@/components/layout/public-layout"
 import { RequireVerifiedPhone } from "@/features/auth/guards"
 import HomePage from "@/features/marketing/home"
@@ -28,7 +28,7 @@ function CityPage() {
 }
 const guard = (el: React.ReactNode) => <RequireVerifiedPhone>{el}</RequireVerifiedPhone>
 
-export const router = createBrowserRouter([
+const routes: RouteObject[] = [
   {
     element: <PublicLayout />,
     children: [
@@ -58,4 +58,7 @@ export const router = createBrowserRouter([
       { path: "*", element: <NotFoundPage /> },
     ],
   },
-])
+]
+
+// The self-contained preview runs inside a sandboxed frame with no real URLs, so it keeps routes in memory.
+export const router = import.meta.env.VITE_ARTIFACT === "1" ? createMemoryRouter(routes, { initialEntries: ["/"] }) : createBrowserRouter(routes)
