@@ -19,7 +19,7 @@ export function NotFoundPage() {
   )
 }
 
-export function BuildingPage({ title, phase }: { title: string; phase: string }) {
+export function BuildingPage({ title, phase, ownerCta }: { title: string; phase: string; ownerCta?: boolean }) {
   const { t } = useTranslation()
   usePageMeta({ title })
   return (
@@ -28,7 +28,10 @@ export function BuildingPage({ title, phase }: { title: string; phase: string })
       <h1 className="mt-4 text-3xl font-bold">{title}</h1>
       <p className="mt-2 text-muted-foreground">{t("building.body")}</p>
       <p className="mt-1 text-sm text-muted-foreground">Planned in {phase} (see docs/PLAN.md).</p>
-      <Button asChild variant="outline" className="mt-6 h-11"><Link to="/explore">{t("nav.explore")}</Link></Button>
+      <div className="mt-6 flex flex-wrap gap-3">
+        {ownerCta && <Button asChild className="h-11 rounded-full"><Link to="/list-your-place">{t("owners.cta")}</Link></Button>}
+        <Button asChild variant="outline" className="h-11 rounded-full"><Link to="/explore">{t("nav.explore")}</Link></Button>
+      </div>
     </div>
   )
 }

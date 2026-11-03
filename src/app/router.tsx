@@ -51,7 +51,7 @@ const routes: RouteObject[] = [
       { path: "/privacy", element: <LegalPage page="privacy" /> },
       { path: "/terms", element: <LegalPage page="terms" /> },
       { path: "/about", element: <LegalPage page="about" /> },
-      { path: "/me/*", element: guard(<BuildingPage title="My places" phase="Phase 6" />) },
+      { path: "/me/*", element: guard(<BuildingPage title="My places" phase="Phase 6" ownerCta />) },
       { path: "/app", element: guard(<AppIndex />) },
       { path: "/app/:slug/*", element: guard(<AppPlace />) },
       { path: "/admin/*", element: guard(<BuildingPage title="Platform admin" phase="Phase 10" />) },

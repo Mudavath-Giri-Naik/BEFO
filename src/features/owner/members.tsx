@@ -209,10 +209,18 @@ function MarkPaidDrawer({ member, onClose }: { member: MemberRow | null; onClose
   )
 }
 
-export function AddMemberDialog({ trigger }: { trigger: ReactNode }) {
+type DialogProps = { trigger?: ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }
+
+/** Uncontrolled with a trigger, or controlled (open/onOpenChange) when opened from elsewhere, e.g. Quick add. */
+function useDialogState({ open, onOpenChange }: DialogProps) {
+  const [own, setOwn] = useState(false)
+  return [open ?? own, onOpenChange ?? setOwn] as const
+}
+
+export function AddMemberDialog(props: DialogProps) {
   const { api, tenant } = useOwner()
   const refresh = useRefresh()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useDialogState(props)
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const save = async () => {
@@ -221,7 +229,7 @@ export function AddMemberDialog({ trigger }: { trigger: ReactNode }) {
   }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {props.trigger && <DialogTrigger asChild>{props.trigger}</DialogTrigger>}
       <DialogContent>
         <DialogHeader><DialogTitle>Add {tenant.type === "hostel" ? "resident" : "member"}</DialogTitle><DialogDescription>When they log in with this number, they are linked automatically.</DialogDescription></DialogHeader>
         <div className="space-y-3">
@@ -235,16 +243,16 @@ export function AddMemberDialog({ trigger }: { trigger: ReactNode }) {
 }
 
 /** Quick action: pick a person → amount defaults to their plan → save. */
-export function RecordCashDialog({ trigger }: { trigger: ReactNode }) {
+export function RecordCashDialog(props: DialogProps) {
   const members = useOwnerQuery("members", (a, t) => a.members(t))
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useDialogState(props)
   const [q, setQ] = useState("")
   const [picked, setPicked] = useState<MemberRow | null>(null)
   const list = (members.data ?? []).filter((m) => !q || m.name.toLowerCase().includes(q.toLowerCase())).slice(0, 8)
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>{trigger}</DialogTrigger>
+        {props.trigger && <DialogTrigger asChild>{props.trigger}</DialogTrigger>}
         <DialogContent>
           <DialogHeader><DialogTitle>Who paid?</DialogTitle><DialogDescription>Pick the person. The amount is filled in from their plan.</DialogDescription></DialogHeader>
           <Input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Type a name" className="h-12" />

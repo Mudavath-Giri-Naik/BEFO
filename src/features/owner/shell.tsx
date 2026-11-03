@@ -81,20 +81,27 @@ function BottomLink({ to, end, label, icon: Icon, count }: { to: string; end?: b
 
 function QuickActions({ trigger }: { trigger: React.ReactNode }) {
   const [open, setOpen] = useState(false)
+  const [dialog, setDialog] = useState<"cash" | "member" | null>(null)
   const soon = ["Add expense (photo / voice / quick)", "Post notice", "Pay salary"]
+  // the sheet closes first, then the chosen dialog opens on its own (no stacked overlays)
+  const pick = (d: "cash" | "member") => { setOpen(false); setDialog(d) }
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent side="bottom" className="mx-auto max-w-lg rounded-t-2xl">
-        <SheetHeader><SheetTitle>Quick add</SheetTitle><SheetDescription>Common jobs in two taps.</SheetDescription></SheetHeader>
-        <div className="grid gap-2 px-4 pb-6">
-          <RecordCashDialog trigger={<Button variant="outline" className="h-14 justify-start gap-3 text-base"><Banknote className="size-5" />Record cash received</Button>} />
-          <AddMemberDialog trigger={<Button variant="outline" className="h-14 justify-start gap-3 text-base"><UserPlus className="size-5" />Add member</Button>} />
-          {soon.map((s) => (
-            <Button key={s} variant="outline" disabled className="h-14 justify-between text-base">{s}<Badge variant="secondary">Coming soon</Badge></Button>
-          ))}
-        </div>
-      </SheetContent>
-    </Sheet>
+    <>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetTrigger asChild>{trigger}</SheetTrigger>
+        <SheetContent side="bottom" className="mx-auto max-w-lg rounded-t-2xl">
+          <SheetHeader><SheetTitle>Quick add</SheetTitle><SheetDescription>Common jobs in two taps.</SheetDescription></SheetHeader>
+          <div className="grid gap-2 px-4 pb-6">
+            <Button variant="outline" className="h-14 justify-start gap-3 text-base" onClick={() => pick("cash")}><Banknote className="size-5" />Record cash received</Button>
+            <Button variant="outline" className="h-14 justify-start gap-3 text-base" onClick={() => pick("member")}><UserPlus className="size-5" />Add member</Button>
+            {soon.map((s) => (
+              <Button key={s} variant="outline" disabled className="h-14 justify-between text-base">{s}<Badge variant="secondary">Coming soon</Badge></Button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
+      <RecordCashDialog open={dialog === "cash"} onOpenChange={(o) => setDialog(o ? "cash" : null)} />
+      <AddMemberDialog open={dialog === "member"} onOpenChange={(o) => setDialog(o ? "member" : null)} />
+    </>
   )
 }
