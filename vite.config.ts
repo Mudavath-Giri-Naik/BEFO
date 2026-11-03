@@ -6,6 +6,11 @@ import { VitePWA } from "vite-plugin-pwa"
 
 const ARTIFACT = process.env.VITE_ARTIFACT === "1"
 
+// A hosted build with a localhost VITE_APP_URL ships wrong canonical links, share links and sitemap URLs.
+if (process.env.VERCEL && /\/\/(localhost|127\.0\.0\.1)\b/.test(process.env.VITE_APP_URL ?? "")) {
+  throw new Error(`VITE_APP_URL is ${process.env.VITE_APP_URL} on Vercel. Set it to the site address (e.g. https://befo-silk.vercel.app) in Vercel → Settings → Environment Variables.`)
+}
+
 export default defineConfig({
   plugins: [
     react(),

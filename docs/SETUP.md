@@ -32,8 +32,8 @@ One real project for now (a separate dev project can come later). What was done,
 3. Keys: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` and `SUPABASE_ANON_KEY` = the **publishable** key; `VITE_DATA_SOURCE=supabase`.
 4. Google: provider enabled in Supabase; Google Cloud OAuth client has the redirect URI
    `https://jplbjlfxrklvznmmrskh.supabase.co/auth/v1/callback` (verified: Google accepts it).
-5. Authentication → URL Configuration: **Site URL** `http://localhost:5173` for now (switch to the Vercel address
-   at G4) and **Redirect URLs** `http://localhost:5173/**`, `http://localhost:5174/**` (+ the Vercel address at G4).
+5. Authentication → URL Configuration (set through the Management API): **Site URL** `https://befo-silk.vercel.app`,
+   **Redirect URLs** `https://befo-silk.vercel.app/**`, `http://localhost:5173/**`, `http://localhost:5174/**`.
 
 ### G3 — Phone OTP (now: console driver · later: MSG91 + DLT, 1–3 days, start early)
 Every signed-in user must verify a phone. Until MSG91 is ready the Send SMS hook runs in **console mode**:
@@ -55,7 +55,7 @@ Every signed-in user must verify a phone. Until MSG91 is ready the Send SMS hook
 3. Remove your test phone number (or keep it only on a dev project) so every real login gets a real SMS.
 4. Log in with a phone that is *not* a test number and confirm the SMS arrives; `public.sms_log` shows `sent`.
 
-### G4 — Vercel (hosting)
+### G4 — Vercel (hosting) — live at https://befo-silk.vercel.app
 1. vercel.com → **Add New → Project** → import `Mudavath-Giri-Naik/BEFO`. Framework preset **Vite**; build
    settings come from `vercel.json` (pnpm install, `pnpm build`, output `dist`). Leave Root Directory empty.
 2. **Environment Variables** (Production + Preview):
@@ -63,7 +63,8 @@ Every signed-in user must verify a phone. Until MSG91 is ready the Send SMS hook
    - `VITE_DATA_SOURCE` = `supabase`
    - `VITE_SUPABASE_URL` = your Project URL
    - `VITE_SUPABASE_ANON_KEY` = the **publishable** key (`sb_publishable_…`) — never the secret key
-   - `VITE_APP_URL` = your site address, e.g. `https://befo.vercel.app` (no trailing slash)
+   - `VITE_APP_URL` = the site address, now `https://befo-silk.vercel.app` (no trailing slash). **Not** the
+     localhost value from `.env` — a Vercel build with a localhost `VITE_APP_URL` fails on purpose (vite.config.ts).
    - optional: `VITE_SUPPORT_WHATSAPP`, `VITE_SUPPORT_EMAIL`, `VITE_MAP_TILE_URL`
    The `/api/*`, `/p/:slug` and `/sitemap.xml` edge functions read the same `VITE_` values.
 3. Deploy. Then in Supabase → Authentication → URL Configuration set **Site URL** to the Vercel address and add
