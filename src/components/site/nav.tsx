@@ -9,19 +9,18 @@ import { homeFor } from "@/features/auth/home"
 import { useAuth } from "@/features/auth/session"
 import { LanguageToggle } from "@/components/layout/toggles"
 import { cn } from "@/lib/utils"
-import { photo } from "./media"
 import { EASE } from "./reveal"
 
 const ITEMS = [
-  { to: "/explore", title: "Explore", sub: "Find a place near you" },
-  { to: "/hostels", title: "Hostels & PGs", sub: "Rooms with live beds" },
-  { to: "/messes", title: "Mess & food", sub: "Today's menus" },
-  { to: "/compare", title: "Compare", sub: "Up to three, side by side" },
-  { to: "/for-owners", title: "For owners", sub: "Run your place" },
-  { to: "/help", title: "Help", sub: "Questions answered" },
+  { to: "/#features", title: "Features", sub: "Members, fees, expenses, staff" },
+  { to: "/#solutions", title: "Solutions", sub: "Mess · Hostel / PG · Tiffin" },
+  { to: "/#pricing", title: "Pricing", sub: "Free during the pilot" },
+  { to: "/demo", title: "Live demo", sub: "Try the owner app" },
+  { to: "/#faq", title: "FAQ", sub: "Questions owners ask" },
+  { to: "/help", title: "Help", sub: "Talk to us" },
 ]
 
-/** Floating pill logo + round icon buttons; the menu opens as a card under them. */
+/** Floating pill logo + business links + login; the menu opens as a card under them. */
 export function SiteNav() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
@@ -48,6 +47,11 @@ export function SiteNav() {
     <header data-site-nav className="fixed inset-x-0 top-0 z-50" style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}>
       <div className="relative mx-auto flex max-w-[1200px] items-center justify-between px-4 sm:px-6">
         <div className="flex h-12 items-center rounded-full border border-foreground/12 bg-background/70 px-5 backdrop-blur-md min-[380px]:h-14 min-[380px]:px-6"><Logo /></div>
+        <nav aria-label="Main" className="absolute left-1/2 hidden h-14 -translate-x-1/2 items-center gap-1 rounded-full border border-foreground/12 bg-background/70 px-2 backdrop-blur-md xl:flex">
+          {ITEMS.slice(0, 5).map((it) => (
+            <Link key={it.to} to={it.to} className="inline-flex h-10 items-center rounded-full px-4 text-[15px] whitespace-nowrap text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">{it.title}</Link>
+          ))}
+        </nav>
         <div className="flex items-center gap-2 sm:gap-2.5">
           {user ? (
             <Link to={home} className={cn(circle, "text-[17px] font-semibold")} aria-label="Your account" title="Your account">{initial}</Link>
@@ -55,16 +59,16 @@ export function SiteNav() {
             <>
               <Link to="/login" className={cn(circle, "sm:hidden")} aria-label={t("nav.login")} title={t("nav.login")}><UserRound className="size-[20px]" strokeWidth={1.6} /></Link>
               <Link to="/login" className="hidden h-14 items-center rounded-full border border-foreground/12 bg-background/70 px-5 text-[15px] font-medium backdrop-blur-md transition-colors hover:bg-card sm:inline-flex">{t("nav.login")}</Link>
+              <Link to="/list-your-place" className="hidden h-14 items-center rounded-full bg-primary px-6 text-[15px] font-medium text-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex">Start free</Link>
             </>
           )}
-          <button type="button" onClick={() => setTheme(dark ? "light" : "dark")} className={cn(circle, "max-sm:hidden")}
+          <button type="button" onClick={() => setTheme(dark ? "light" : "dark")} className={cn(circle, "max-sm:hidden", !user && "max-xl:hidden")}
             aria-label={dark ? "Switch to light theme" : "Switch to dark theme"} title={dark ? "Light theme" : "Dark theme"}>
             <span className="relative block size-5" aria-hidden>
               <Sun className={cn("absolute inset-0 size-5 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]", dark ? "rotate-90 scale-50 opacity-0" : "rotate-0 scale-100 opacity-100")} strokeWidth={1.6} />
               <Moon className={cn("absolute inset-0 size-5 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]", dark ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-50 opacity-0")} strokeWidth={1.6} />
             </span>
           </button>
-          <Link to="/explore" className={circle} aria-label={t("nav.explore")}><Search className="size-[20px]" strokeWidth={1.6} /></Link>
           <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="site-menu" aria-label={t("nav.menu")}
             className={cn(circle, open && "border-brand bg-brand text-white hover:bg-brand")}>
             <span className="relative block h-3.5 w-5" aria-hidden>
@@ -92,10 +96,11 @@ export function SiteNav() {
                   </li>
                 ))}
               </ul>
-              <Link to="/explore" className="group relative mt-4 block h-36 overflow-hidden rounded-[22px]">
-                <img src={photo("chaise", 900, 360)} alt="" className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
-                <span className="absolute inset-0 bg-black/35" />
-                <span className="relative flex h-full items-center justify-center gap-2 text-[26px] font-medium text-white">Find a place <ArrowUpRight className="size-7 transition-transform duration-500 group-hover:rotate-45" strokeWidth={1.5} /></span>
+              <Link to={user ? homeFor(context) : "/list-your-place"} className="group relative mt-4 flex h-28 items-center justify-center gap-2 overflow-hidden rounded-[22px] bg-primary text-[24px] font-medium text-primary-foreground">
+                {user ? "Open your app" : "Start free"} <ArrowUpRight className="size-7 transition-transform duration-500 group-hover:rotate-45" strokeWidth={1.5} />
+              </Link>
+              <Link to="/explore" className="mt-2 flex min-h-12 items-center justify-center gap-2 rounded-full text-[15px] text-muted-foreground hover:bg-muted hover:text-foreground">
+                <Search className="size-4" aria-hidden />Looking for a place to stay? Explore
               </Link>
               <div className="mt-3 flex items-center justify-between gap-2 px-1">
                 {user ? (

@@ -8,7 +8,6 @@ import { BuildingPage, LegalPage, NotFoundPage } from "@/features/marketing/simp
 const ExplorePage = lazy(() => import("@/features/explore/explore"))
 const PlacePage = lazy(() => import("@/features/explore/place-page"))
 const ComparePage = lazy(() => import("@/features/explore/compare"))
-const ForOwnersPage = lazy(() => import("@/features/marketing/for-owners"))
 const LoginPage = lazy(() => import("@/features/auth/login"))
 const JoinPage = lazy(() => import("@/features/customer/join"))
 const ListYourPlace = lazy(() => import("@/features/onboarding-owner/wizard"))
@@ -43,7 +42,7 @@ const routes: RouteObject[] = [
       { path: "/p/:slug/join", element: guard(<JoinPage />) },
       { path: "/j/:slug", element: <QrEntry /> },
       { path: "/compare", element: <ComparePage /> },
-      { path: "/for-owners", element: <ForOwnersPage /> },
+      { path: "/for-owners", element: <Navigate to="/" replace /> },
       { path: "/demo", element: <DemoIndex /> },
       { path: "/demo/:slug/*", element: <DemoOwner /> },
       { path: "/list-your-place", element: guard(<ListYourPlace />) },

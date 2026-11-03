@@ -43,3 +43,7 @@ Code: `src/lib/{money,dates,billing,payroll,finance}.ts` (unit-tested in `tests/
 - Daily wage: `rate × days present` (everyone present unless an absence is logged).
 - Adjustments: bonus/overtime add, deductions subtract, advance recovery subtracts up to what is left; the rest carries to the next payout. Net never below zero.
 - Example (tested): ₹12,000/month, joined 10 Nov, 30-day month → 21 days → **₹8,400**, paid 1 Dec.
+
+## Platform pricing (home page) — `src/features/marketing/pricing.ts`
+- Prices are paise `bigint`. Yearly billing charges **10 months for 12** (`YEARLY_MONTHS_CHARGED`); saving = 12 × monthly − yearly.
+- "Per month, billed yearly" = yearly ÷ 12, rounded to the nearest rupee (half up). Tested: ₹499 → ₹416, ₹999 → ₹833, ₹1,999 → ₹1,666.

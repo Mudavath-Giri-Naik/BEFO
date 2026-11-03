@@ -12,17 +12,17 @@ export function SiteFooter() {
   const { t } = useTranslation()
   const year = new Date().getFullYear()
   const cols: { title: string; links: [string, string][] }[] = [
-    { title: "Menu", links: [["/explore", t("nav.explore")], ["/hostels", "Hostels & PGs"], ["/messes", t("nav.mess")], ["/compare", t("common.compare")]] },
-    { title: "Owners", links: [["/for-owners", t("nav.forOwners")], ["/list-your-place", "List your place"], ["/demo", "Owner demo"]] },
+    { title: "Product", links: [["/#features", "Features"], ["/#solutions", "Solutions"], ["/#pricing", "Pricing"], ["/demo", "Live demo"], ["/list-your-place", "Start free"]] },
+    { title: "For students", links: [["/explore", t("nav.explore")], ["/hostels", "Hostels & PGs"], ["/messes", t("nav.mess")]] },
     { title: "Help", links: [["/help", t("footer.help")], ["/terms", t("footer.terms")], ["/privacy", t("footer.privacy")], ["/help#report", t("footer.report")]] },
   ]
   const top = () => { const l = getLenis(); if (l) l.scrollTo(0, { duration: 1.6 }); else window.scrollTo({ top: 0, behavior: "smooth" }) }
   return (
     <footer className="mt-auto bg-footer text-footer-foreground" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}>
       <div className="mx-auto max-w-[1200px] px-5 pt-24 sm:px-8">
-        <Reveal><Eyebrow light>Your stay</Eyebrow></Reveal>
-        <Words text="Always here for students and the people who host them" className="mt-4 max-w-[760px] text-[38px] leading-[1.08] sm:text-[56px]" />
-        <Reveal delay={0.15} className="mt-8"><CtaPill to="/explore" light>Find a place</CtaPill></Reveal>
+        <Reveal><Eyebrow light>Get started</Eyebrow></Reveal>
+        <Words text="Your place, running itself by next week" className="mt-4 max-w-[760px] text-[38px] leading-[1.08] sm:text-[56px]" />
+        <Reveal delay={0.15} className="mt-8"><CtaPill to="/list-your-place" light>Start free</CtaPill></Reveal>
 
         <div className="mt-20 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-4">
           {cols.map((c) => (

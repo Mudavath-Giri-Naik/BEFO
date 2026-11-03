@@ -13,7 +13,7 @@ export function DemoBanner() {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   // only on browsing pages; place pages have their own bottom bar and /demo has its own note
-  if (!isDemoData || !["/", "/explore", "/hostels", "/messes", "/compare"].includes(pathname)) return null
+  if (!isDemoData || !["/explore", "/hostels", "/messes", "/compare"].includes(pathname)) return null
   return (
     <div data-demo-banner className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pointer-events-none">
       <p className="pointer-events-auto flex items-center gap-2 rounded-full border border-foreground/10 bg-popover/95 px-4 py-2 text-[13px] shadow-lg backdrop-blur"><Info className="size-4 shrink-0" aria-hidden />{t("common.demoData")}</p>

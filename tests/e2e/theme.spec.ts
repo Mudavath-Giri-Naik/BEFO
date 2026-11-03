@@ -23,7 +23,7 @@ test("menu offers light, dark and system", async ({ page }) => {
 test("footer shows on the home page only", async ({ page }) => {
   await page.goto("/")
   await expect(page.getByRole("contentinfo")).toHaveCount(1)
-  for (const path of ["/explore", "/p/annapurna-mess", "/for-owners", "/login", "/demo/demo-mess"]) {
+  for (const path of ["/explore", "/p/annapurna-mess", "/login", "/demo/demo-mess"]) {
     await page.goto(path)
     await expect(page.getByRole("contentinfo"), path).toHaveCount(0)
   }
