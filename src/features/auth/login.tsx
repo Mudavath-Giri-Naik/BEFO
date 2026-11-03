@@ -36,14 +36,15 @@ export default function LoginPage({ mode = "login" }: { mode?: "login" | "verify
   const nav = useNavigate()
   const [sp] = useSearchParams()
   const next = safeNext(sp.get("next"))
-  const { user, phoneVerified, context } = useAuth()
+  const { user, phoneVerified, context, contextSettled } = useAuth()
   const [usePhone, setUsePhone] = useState(mode === "verify")
   usePageMeta({ title: mode === "verify" ? t("auth.verifyTitle") : t("auth.title") })
 
   useEffect(() => {
-    if (user && phoneVerified) nav(next ?? homeFor(context), { replace: true })
+    // wait for my_context before routing, otherwise an owner is sent to /me while it is still loading
+    if (user && phoneVerified && (next || contextSettled)) nav(next ?? homeFor(context), { replace: true })
     else if (user && !phoneVerified && mode === "login") nav(`/login/verify-phone${next ? `?next=${encodeURIComponent(next)}` : ""}`, { replace: true })
-  }, [user, phoneVerified, context, next, nav, mode])
+  }, [user, phoneVerified, context, contextSettled, next, nav, mode])
 
   const google = async () => {
     if (!supabase) return

@@ -17,9 +17,11 @@ interface Auth {
   /** Phone confirmed in Supabase Auth (§11.2). Nothing beyond browsing works without it. */
   phoneVerified: boolean
   context: MyContext | null
+  /** my_context has finished loading (or failed), so routing by it is safe. */
+  contextSettled: boolean
   signOut: () => Promise<void>
 }
-const Ctx = createContext<Auth>({ ready: true, session: null, user: null, phoneVerified: false, context: null, signOut: async () => {} })
+const Ctx = createContext<Auth>({ ready: true, session: null, user: null, phoneVerified: false, context: null, contextSettled: true, signOut: async () => {} })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient()
@@ -44,15 +46,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   })
   const signOut = async () => { await supabase?.auth.signOut(); qc.clear() }
-  return <Ctx.Provider value={{ ready, session, user, phoneVerified, context: ctx.data ?? null, signOut }}>{children}</Ctx.Provider>
+  return <Ctx.Provider value={{ ready, session, user, phoneVerified, context: ctx.data ?? null, contextSettled: !ctx.isPending || ctx.isError, signOut }}>{children}</Ctx.Provider>
 }
 
 export const useAuth = () => useContext(Ctx)
 
-/** Where to go after login (§11.7): staff → /app, customer → /me, both → /me with sections. */
+/**
+ * Where to go after login (§11.7): staff → /app, customer → /me. The spec sends "both" to /me with sections;
+ * until the customer app exists (Phase 6) staff go to their place first, so an owner who is also a member
+ * somewhere is not stranded on a placeholder.
+ */
 export function homeFor(c: MyContext | null): string {
   if (!c) return "/me"
-  if (c.memberships.length > 0) return "/me"
   if (c.staff.length === 1) return `/app/${c.staff[0].slug}`
   if (c.staff.length > 1) return "/app"
   if (c.is_platform_admin) return "/admin"
