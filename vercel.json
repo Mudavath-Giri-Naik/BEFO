@@ -62,7 +62,16 @@
       ]
     },
     {
-      "source": "/(sw.js|workbox-(.*).js|manifest.webmanifest|index.html)",
+      "source": "/(sw.js|manifest.webmanifest|index.html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/workbox-(.*)",
       "headers": [
         {
           "key": "Cache-Control",
