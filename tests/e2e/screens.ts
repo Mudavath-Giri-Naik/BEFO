@@ -2,7 +2,7 @@
 import { chromium } from "@playwright/test"
 
 const BASE = process.env.BASE_URL ?? "http://localhost:4173"
-const PAGES = [["home", "/"], ["explore", "/explore"], ["place-hostel", "/p/sri-lakshmi-ladies-hostel"], ["place-mess", "/p/annapurna-mess"], ["for-owners", "/for-owners"], ["login", "/login"]]
+const PAGES = [["home", "/"], ["explore", "/explore"], ["place-hostel", "/p/sri-lakshmi-ladies-hostel"], ["place-mess", "/p/annapurna-mess"], ["owner-demo", "/demo/demo-mess"], ["login", "/login"]]
 const SIZES = [375, 768, 1280]
 
 const browser = await chromium.launch()

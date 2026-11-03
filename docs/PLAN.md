@@ -10,7 +10,7 @@ Spec: `BUILD_PROMPT_v3.md`. This file tracks what is done, what is next, and the
 | 1 Database core | Tenancy, people, billing, place profile, rooms/beds, menus, join requests, claims, payments, ledger core, notifications, jobs, passkeys, SMS log; public API; RLS; seed (3 demo + 2 isolation tenants) | **Done.** `pnpm test:rls` = 517 checks green, `pnpm db:lint` green |
 | 2 Auth | Google + mandatory phone OTP, guards, `link_my_memberships`, routing by `my_context` | **Live on hosted Supabase:** Google sign-in, phone OTP via `sms-hook` (console driver + a fixed test number until MSG91), place switcher. Pending: MSG91 (G3), Turnstile widget |
 | 3 Owner setup | `/list-your-place` wizard, presets, plans, fields, rooms, menu editor, public page editor, QR poster | **Wizard done** (3 steps → `create_tenant`). Next: rooms/floors editor, menu editor, public page editor with photos + pin, QR poster, `create-tenant` script |
-| 4 Marketplace | Home, explore (filters, map, compare, saves), place page, join flow | **Public pages + join flow done.** Pages Functions written (edge-cached `/api/explore`, `/api/place/:slug`, `/p/:slug` meta/OG/JSON-LD, `/sitemap.xml`) — untested until G4. Pending: notifications UI + push/email, Lighthouse pass |
+| 4 Marketplace | Business home (`/`), explore (filters, map, compare, saves), place page, join flow | **Public pages + join flow done.** Pages Functions written (edge-cached `/api/explore`, `/api/place/:slug`, `/p/:slug` meta/OG/JSON-LD, `/sitemap.xml`) — untested until G4. Pending: notifications UI + push/email, Lighthouse pass |
 | 5 Members & payments | Members table, "I paid" claims, mark paid, void, reminders, charges, import/export | **Owner Today / Inbox / Members (mark paid, WhatsApp reminder, add member, confirm/ask/reject claims, approve/waitlist/reject requests) done**, also as read-only `/demo`. Next: customer "I paid" screen, void/extend/pause UI, charges, Excel import/export |
 | 6 Customer app & card | `/me`, profile form, selfie, passkey card | Tables ready (passkeys, challenges, unlocks). Not started |
 | 7 Team | Employees, absences, payouts | `computePayout` + tests done. Tables/UI not started |
@@ -39,6 +39,8 @@ Spec: `BUILD_PROMPT_v3.md`. This file tracks what is done, what is next, and the
 - **App** runs on `VITE_DATA_SOURCE=supabase` locally. e2e stays on demo data by design.
 
 ## Left to do
+
+- **Confirm the pricing** on the home page (`src/features/marketing/pricing.ts`) before real owners see it.
 
 | What | Why it matters | Who |
 |---|---|---|

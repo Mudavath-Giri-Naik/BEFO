@@ -5,7 +5,7 @@ test("home is the business site: dashboard, pricing and a way in", async ({ page
   await page.goto("/")
   await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(/Run your mess, hostel or PG/)
   await expect(page.getByText("Example data").first()).toBeVisible()
-  await page.getByRole("radio", { name: /Yearly/ }).click()
+  await page.getByRole("radio", { name: /yearly/i }).click()
   await expect(page.getByText(/you save/).first()).toBeVisible()
   await page.getByRole("link", { name: "Start free" }).filter({ visible: true }).first().click()
   await expect(page).toHaveURL(/\/login\?next=%2Flist-your-place/)
@@ -31,7 +31,8 @@ test("no horizontal scroll at 320px", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 })
   for (const path of ["/", "/explore", "/p/annapurna-mess", "/demo/demo-mess", "/login"]) {
     await page.goto(path)
-    await page.waitForLoadState("networkidle")
+    await page.waitForLoadState("load")
+    await page.waitForTimeout(800) // let reveals and lazy chunks settle (the demo app keeps polling, so no "networkidle")
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
     expect(overflow, path).toBeLessThanOrEqual(0)
   }

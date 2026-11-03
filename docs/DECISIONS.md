@@ -81,3 +81,16 @@ by string replacement on the shell instead of HTMLRewriter. Edge responses are c
   owners who are also members, applicants, new users) → `/me`, which lists admin link, applications, places run and
   places stayed at. Phones get a header login/account button in place of the theme toggle (theme stays in the menu).
 - **Existing places** (`befo-test-hostel`, `vijaya-food-court`) were created before this rule and stay as they are.
+
+## 2026-11-03 — Home page is for businesses (owner's request)
+- **`/` is the product site for owners** (mess, hostel/PG, tiffin): hero with an owner dashboard drawn in real UI
+  (labelled "Example data", numbers add up), problems → fixes, feature bento, per-type solutions, money-leak
+  calculator (labelled as an estimate), how it works, pricing, trust, FAQ, final CTA. Students keep `/explore`
+  (linked from the menu and footer). `/for-owners` redirects to `/` and left the sitemap.
+- **Pricing numbers are now shown** (overrides spec §"No pricing numbers"): Starter ₹499, Growth ₹999, Pro ₹1,999 per
+  month; yearly = 10 months for 12; 90 days free during the pilot (matches `trial_ends_at`). Placeholders chosen by
+  Claude — the owner confirms or edits them in `src/features/marketing/pricing.ts`.
+- **No overpromising:** features not built yet carry a "Soon" tag (photo expenses, salaries, P&L, weekly close, bank
+  matching, CA pack, documents vault, notebook import). No invented reviews, logos or customer counts.
+- **Navbar for owners:** Features · Solutions · Pricing · Demo · FAQ (≥1280 px), Log in + Start free (≥640 px); phones get
+  logo + login + menu. Cross-page `/#section` links jump natively (Lenis `scrollTo` did not move the page there).

@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { CtaPill } from "@/components/site/cta"
 import { Eyebrow, Reveal, Words } from "@/components/site/reveal"
-import { getLenis } from "@/components/site/smooth-scroll"
 import { formatRupees } from "@/lib/money"
 import { usePageMeta } from "@/lib/meta"
 import { cn } from "@/lib/utils"
@@ -41,20 +40,22 @@ export default function HomePage() {
   )
 }
 
-/** /#pricing etc. from another page: scroll once the section exists. */
+/** /#pricing etc. from another page: jump to the section, re-checking while the page finishes laying out. */
 function useHashScroll() {
   const { hash } = useLocation()
   useEffect(() => {
     if (!hash) return
-    const id = setTimeout(() => {
+    let tries = 0
+    let settled = 0
+    const id = setInterval(() => {
       const el = document.getElementById(hash.slice(1))
-      if (!el) return
-      const top = el.getBoundingClientRect().top + window.scrollY - 96
-      const l = getLenis()
-      if (l) l.scrollTo(top, { immediate: true, force: true })
-      else window.scrollTo(0, top)
-    }, 150)
-    return () => clearTimeout(id)
+      if (!el || ++tries > 30) return clearInterval(id)
+      const top = Math.round(el.getBoundingClientRect().top + window.scrollY - 96)
+      if (Math.abs(window.scrollY - top) < 2) { if (++settled >= 3) clearInterval(id); return }
+      settled = 0
+      window.scrollTo(0, top) // a plain jump; Lenis follows native scroll position
+    }, 100)
+    return () => clearInterval(id)
   }, [hash])
 }
 
