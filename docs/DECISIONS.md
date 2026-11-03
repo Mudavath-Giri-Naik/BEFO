@@ -94,3 +94,9 @@ by string replacement on the shell instead of HTMLRewriter. Edge responses are c
   matching, CA pack, documents vault, notebook import). No invented reviews, logos or customer counts.
 - **Navbar for owners:** Features · Solutions · Pricing · Demo · FAQ (≥1280 px), Log in + Start free (≥640 px); phones get
   logo + login + menu. Cross-page `/#section` links jump natively (Lenis `scrollTo` did not move the page there).
+
+## 2026-11-03 — Updates apply by themselves
+- The PWA used `registerType: "prompt"`, so returning visitors kept the old site until they tapped "Update". Now
+  `autoUpdate` + `skipWaiting`/`clientsClaim`/`cleanupOutdatedCaches`: a new deploy takes over on the next visit and an
+  open tab reloads into it (checked when the tab comes back and every 30 min). The reload waits while someone is typing
+  or has a dialog open, so nothing half-filled is lost. Missing lazy chunks after a deploy also reload (`src/app/pwa.ts`).

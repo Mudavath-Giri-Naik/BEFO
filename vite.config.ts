@@ -16,7 +16,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
     !ARTIFACT && VitePWA({
-      registerType: "prompt",
+      registerType: "autoUpdate", // new deploys take over by themselves; see src/app/pwa.ts
       injectRegister: false,
       includeAssets: ["favicon.svg", "apple-touch-icon.png", "robots.txt"],
       manifest: {
@@ -36,6 +36,9 @@ export default defineConfig({
       workbox: {
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api\//, /^\/sitemap\.xml$/],
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
       },
     }),
   ],
