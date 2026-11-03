@@ -65,3 +65,19 @@ by string replacement on the shell instead of HTMLRewriter. Edge responses are c
   `can_see_money`, …) only answer about the caller. `rls_enabled_no_policy` (6 tables) is the deliberate
   service-role-only list. Performance INFOs (unindexed FKs, unused indexes on an empty DB) and
   `multiple_permissive_policies` (read policy + owner `for all` write policy) are left until there is real traffic.
+
+## 2026-11-03 — Admin approval before any business exists (owner's request)
+- **Owners apply; admins create.** `/list-your-place` now calls `apply_for_place` → a row in `place_applications`
+  (status `pending`, slug reserved). Nothing else is created. `admin_decide_application('approve')` runs the old
+  provisioning (tenant, settings, owner staff row, place profile, usage, preset accounts/categories, first plan) in
+  one transaction via the internal `_provision_tenant`; `reject` needs a reason the owner sees. `create_tenant` is dropped.
+  Owners can have up to 3 pending applications and can withdraw them.
+- **Admins by e-mail.** `platform_settings.admin_emails` (jsonb array, set per project with SQL — not in git). On login
+  `link_my_memberships` adds a user whose *confirmed* e-mail is listed to `platform_admins`. Admins still verify a phone.
+- **Admin console = counts and business data only.** `admin_overview`, `admin_applications`, `admin_places` are definer
+  functions that check `is_platform_admin()`; they expose owner/applicant contact details (needed to reach a business)
+  but no member names, payments or ledger — the isolation suite still proves admins cannot read those tables.
+- **One home after login.** Admins → `/admin`; people who only run places → their owner app; everyone else (students,
+  owners who are also members, applicants, new users) → `/me`, which lists admin link, applications, places run and
+  places stayed at. Phones get a header login/account button in place of the theme toggle (theme stays in the menu).
+- **Existing places** (`befo-test-hostel`, `vijaya-food-court`) were created before this rule and stay as they are.

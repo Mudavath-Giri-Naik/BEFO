@@ -1,14 +1,16 @@
-import { useQuery } from "@tanstack/react-query"
-import { Check, Loader2, X } from "lucide-react"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { Check, Clock, Loader2, X } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router"
+import { Link } from "react-router"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
+import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { brand } from "@/app/brand"
+import { useAuth } from "@/features/auth/session"
 import { parseIndianAmount, formatRupees } from "@/lib/money"
 import { usePageMeta } from "@/lib/meta"
 import { slugify, validateSlug } from "@/lib/slug"
@@ -23,15 +25,23 @@ const TYPES: { v: Type; label: string; hint: string }[] = [
 ]
 const CITIES = ["Vizianagaram", "Visakhapatnam", "Srikakulam", "Vijayawada", "Guntur", "Hyderabad"]
 const ERR: Record<string, string> = {
-  slug_taken: "That web address is taken. Try another.", rate_limited: "You've created several places today. Try again tomorrow.",
-  phone_not_verified: "Verify your mobile number first.",
+  slug_taken: "That web address is taken. Try another.", rate_limited: "You've sent several applications today. Try again tomorrow.",
+  phone_not_verified: "Verify your mobile number first.", too_many_pending: "You already have 3 applications waiting. We'll review them soon.",
+  name_required: "Enter the name of your place.",
 }
 
-/** /list-your-place: 3 short steps, mostly taps (§16, zero-work rule 5). Rooms, photos and menu come after, inside the app. */
+/**
+ * /list-your-place: 3 short steps, mostly taps (§16, zero-work rule 5). The answers become an application; the business
+ * and its owner app are created only when a platform admin approves it. Rooms, photos and menu come after, inside the app.
+ */
 export default function ListYourPlace() {
   usePageMeta({ title: "List your place" })
-  const nav = useNavigate()
+  const qc = useQueryClient()
+  const { context } = useAuth()
+  const waiting = context?.applications?.filter((a) => a.status === "pending") ?? []
   const [step, setStep] = useState(0)
+  const [note, setNote] = useState("")
+  const [sent, setSent] = useState(false)
   const [type, setType] = useState<Type | "">("")
   const [audience, setAudience] = useState("any")
   const [name, setName] = useState("")
@@ -52,23 +62,44 @@ export default function ListYourPlace() {
 
   const canNext = [!!type, name.trim().length >= 2 && !slugError && avail.data === true && city.trim().length > 1, true][step]
 
-  const create = async () => {
+  const apply = async () => {
     if (!supabase || !type) return
     setBusy(true)
-    const { data, error } = await supabase.rpc("create_tenant", {
+    const { error } = await supabase.rpc("apply_for_place", {
       p_name: name.trim(), p_slug: slug, p_type: type, p_city: city.trim(), p_audience: type === "hostel" ? audience : "any",
       p_plan_name: type === "hostel" ? "Monthly rent" : "Monthly", p_plan_price_paise: pricePaise != null ? Number(pricePaise) : null,
+      p_note: note.trim() || null,
     })
     setBusy(false)
     if (error) return toast.error(ERR[error.message] ?? error.message)
-    toast.success(`${name} is set up`)
-    nav(`/app/${(data as { slug: string }).slug}`, { replace: true })
+    setSent(true)
+    qc.invalidateQueries({ queryKey: ["my-context"] })
+  }
+
+  if (sent) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-16">
+        <span className="flex size-14 items-center justify-center rounded-full bg-turmeric-soft"><Clock className="size-7" aria-hidden /></span>
+        <h1 className="mt-6 text-3xl font-bold">Sent for approval</h1>
+        <p className="mt-2 text-muted-foreground">
+          We check every new place before it's set up, usually within a day. You'll get a notification, and {name.trim()} will
+          appear in your home. Nothing is created until then.
+        </p>
+        <Button asChild className="mt-8 h-12 w-full rounded-full sm:w-auto sm:px-8"><Link to="/me">Go to your home</Link></Button>
+      </div>
+    )
   }
 
   return (
     <div className="mx-auto max-w-lg px-4 py-10">
       <Progress value={((step + 1) / 3) * 100} className="h-2" aria-label={`Step ${step + 1} of 3`} />
-      <p className="mt-3 text-sm text-muted-foreground">Step {step + 1} of 3 · free during the pilot</p>
+      <p className="mt-3 text-sm text-muted-foreground">Step {step + 1} of 3 · free during the pilot · we approve every place</p>
+      {waiting.length > 0 && step === 0 && (
+        <Link to="/me" className="mt-5 flex min-h-14 items-center gap-3 rounded-xl border border-turmeric bg-turmeric-soft px-4 text-sm">
+          <Clock className="size-5 shrink-0" aria-hidden />
+          <span className="min-w-0 flex-1"><b className="font-semibold">{waiting.map((a) => a.name).join(", ")}</b> {waiting.length === 1 ? "is" : "are"} waiting for approval. You can still apply for another place.</span>
+        </Link>
+      )}
 
       {step === 0 && (
         <section className="mt-6 space-y-6">
@@ -126,6 +157,8 @@ export default function ListYourPlace() {
             {pricePaise != null && <p className="text-sm text-muted-foreground">{formatRupees(pricePaise)} per month</p>}
           </div>
           <p className="text-sm text-muted-foreground">You can skip this and set prices later.</p>
+          <div className="space-y-2"><Label htmlFor="note">Anything we should know? (optional)</Label>
+            <Textarea id="note" value={note} onChange={(e) => setNote(e.target.value)} rows={3} maxLength={1000} placeholder="e.g. 40 beds near GMR college, running since 2019" /></div>
         </section>
       )}
 
@@ -133,7 +166,7 @@ export default function ListYourPlace() {
         {step > 0 && <Button variant="outline" className="h-12 flex-1" onClick={() => setStep(step - 1)}>Back</Button>}
         {step < 2
           ? <Button className="h-12 flex-1" disabled={!canNext} onClick={() => setStep(step + 1)}>Next</Button>
-          : <Button className="h-12 flex-1" disabled={busy || (!!price && pricePaise === null)} onClick={create}>{busy ? "Setting up…" : "Create my place"}</Button>}
+          : <Button className="h-12 flex-1" disabled={busy || (!!price && pricePaise === null)} onClick={apply}>{busy ? "Sending…" : "Send for approval"}</Button>}
       </div>
     </div>
   )

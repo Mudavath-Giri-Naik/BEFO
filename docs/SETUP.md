@@ -35,6 +35,13 @@ One real project for now (a separate dev project can come later). What was done,
 5. Authentication → URL Configuration (set through the Management API): **Site URL** `https://befo-silk.vercel.app`,
    **Redirect URLs** `https://befo-silk.vercel.app/**`, `http://localhost:5173/**`, `http://localhost:5174/**`.
 
+### Platform admins
+Admins are listed by e-mail (Google account) in `platform_settings.admin_emails`. Current: `yourgirinaik@gmail.com`.
+To change it run in the SQL editor:
+`update public.platform_settings set value = '["first@gmail.com","second@gmail.com"]' where key = 'admin_emails';`
+The person becomes admin the next time they log in (Google → verify phone). Remove someone with
+`delete from public.platform_admins where user_id = (select id from auth.users where email = '…');` and take them off the list.
+
 ### G3 — Phone OTP (now: console driver · later: MSG91 + DLT, 1–3 days, start early)
 Every signed-in user must verify a phone. Until MSG91 is ready the Send SMS hook runs in **console mode**:
 - `sms-hook` is deployed without JWT check:

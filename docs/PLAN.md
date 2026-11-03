@@ -16,7 +16,7 @@ Spec: `BUILD_PROMPT_v3.md`. This file tracks what is done, what is next, and the
 | 7 Team | Employees, absences, payouts | `computePayout` + tests done. Tables/UI not started |
 | 8 Smart Capture | captures, AI worker, drafts, payables | Not started (ledger core + dedupe/category helpers done) |
 | 9 Finance intelligence | P&L, Money Map, forecast, statements, Weekly Close | P&L definitions + summary table done. Rest not started |
-| 10 Platform & pitch | Admin console, `/for-owners`, `/demo`, legal | `/for-owners` (leak calculator), `/demo` (owner app on example data, mess/boys/girls switch) and draft legal pages done; admin SQL done. Pending: admin console UI, book-vs-us animation |
+| 10 Platform & pitch | Admin console, `/for-owners`, `/demo`, legal | **Admin console live** (`/admin`: overview, applications → approve/reject, places → publish/verify/suspend, reports). New businesses need admin approval (0011). `/for-owners`, `/demo`, draft legal pages done. Pending: book-vs-us animation |
 | 11 Backups & security | Backup workflow, CSP, restore tests | `_headers` with CSP/HSTS/Permissions-Policy done. Backup workflow + restore tests not started |
 | 12 Polish | Motion, Telugu, PWA, a11y, perf | Telugu strings for public site done. Perf budget currently exceeded (see below) |
 | 13 Deploy & pilot | Vercel + hosted Supabase | **Supabase live** (G2 done, see below). Vercel import pending (G4). Then G3, G5–G7 |
@@ -50,7 +50,8 @@ Spec: `BUILD_PROMPT_v3.md`. This file tracks what is done, what is next, and the
 | Email (Resend) and push (VAPID) keys | Notifications | Owner |
 | Rotate `SUPABASE_ACCESS_TOKEN` when setup is done; a separate dev project later | Least privilege | Owner |
 | Performance advisors: index FKs, merge overlapping read/write policies once there is traffic | Speed at scale | Claude |
-| `/me` customer app (Phase 6) — currently a placeholder with "List your place" / "Explore" | Members' own screen | Claude |
+| Customer app (Phase 6): `/me` now lists places, applications and due dates; still to come: "I paid", join-request status, card | Members' own screen | Claude |
+| Disable the unused e-mail/password provider (Authentication → Providers → Email) | App uses Google + phone only; admin rights follow a confirmed e-mail | Owner |
 
 ## Zero-work audit (recurring human tasks)
 

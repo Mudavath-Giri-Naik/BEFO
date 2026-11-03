@@ -140,7 +140,7 @@ async function main() {
     ok((await q("select count(*)::int n from public.search_places()")).rows[0].n === 3, "search returns only public places")
     ok((await q("select count(*)::int n from public.search_places(p_type => 'hostel', p_audience => 'girls')")).rows[0].n === 1, "audience filter")
     ok((await q("select public.public_join_info('other-a') d")).rows[0].d?.name === "Other Tenant A", "QR join info works for private places")
-    for (const fn of ["public._record_member_payment(null,null,null,null,null,null,null,null,null)", "public._trust()", "public.create_tenant('x','xyz-abc','mess','c')", "public.mark_paid(null, 1)", "public.verified_phone()"]) {
+    for (const fn of ["public._record_member_payment(null,null,null,null,null,null,null,null,null)", "public._trust()", "public.apply_for_place('x','xyz-abc','mess','c')", "public._provision_tenant(null,null,null,null,null,null,null,null,null)", "public.admin_overview()", "public.mark_paid(null, 1)", "public.verified_phone()"]) {
       const err = await fails(q, `select ${fn}`)
       ok(err && /permission denied/.test(err), `anon cannot execute ${fn.split("(")[0]}`)
     }
@@ -158,7 +158,7 @@ async function main() {
     await as(c, user, async (q) => {
       for (const t of tenantTables) {
         // rows addressed to the person themself (their own join request / notification) are allowed
-        const own = ["join_requests", "notifications", "card_unlocks"].includes(t) ? " or user_id = auth.uid()" : ""
+        const own = ["join_requests", "notifications", "card_unlocks", "place_applications"].includes(t) ? " or user_id = auth.uid()" : ""
         const r = await q<{ n: number }>(`select count(*)::int n from public.${t} where not (tenant_id = any($1::uuid[])${own})`, [allowed])
         ok(r.rows[0].n === 0, `user ${user.slice(-2)} sees no foreign rows in ${t}`)
       }
@@ -239,7 +239,7 @@ async function main() {
   await as(c, U.noPhone, async (q) => {
     ok(/phone_not_verified/.test((await fails(q, "select public.request_to_join('annapurna-mess', 'G', true, true)")) ?? ""), "join needs a verified phone")
     ok(/phone_not_verified/.test((await fails(q, "select public.link_my_memberships()")) ?? ""), "linking needs a verified phone")
-    ok(/phone_not_verified/.test((await fails(q, "select public.create_tenant('X', 'xyz-place', 'mess', 'Vizag')")) ?? ""), "creating a place needs a verified phone")
+    ok(/phone_not_verified/.test((await fails(q, "select public.apply_for_place('X', 'xyz-place', 'mess', 'Vizag')")) ?? ""), "applying for a place needs a verified phone")
   })
 
   // ── 9. platform admin has no member/finance PII
@@ -284,6 +284,63 @@ async function main() {
     const checks = (await q("select checks from public.payment_claims where id = $1", [cid])).rows[0].checks
     ok(checks.duplicate_utr === true && checks.amount_match === true, "duplicate UTR is flagged on a new claim")
   })
+
+  // ── 10b. a business exists only after a platform admin approves its application
+  {
+    let appId = ""
+    await as(c, U.outsider, async (q) => {
+      appId = (await q("select public.apply_for_place('New Mess', 'new-mess-test', 'mess', 'Vizag', 'any', 'Monthly', 250000, 'near college') id")).rows[0].id
+      ok((await q("select count(*)::int n from public.tenants where slug = 'new-mess-test'")).rows[0].n === 0, "applying creates no tenant")
+      ok((await q("select public.slug_available('new-mess-test') v")).rows[0].v === false, "a pending application reserves its slug")
+      ok((await q("select jsonb_array_length(public.my_context()->'applications') n")).rows[0].n === 1, "my_context lists my pending application")
+      ok(/permission denied/.test((await fails(q, "select public._provision_tenant(auth.uid(), '+919000000009', 'X', 'xx-yy', 'mess', '', 'any', null, null)")) ?? ""), "owners cannot provision a tenant themselves")
+      ok(/forbidden/.test((await fails(q, "select public.admin_decide_application($1, 'approve')", [appId])) ?? ""), "applicants cannot approve themselves")
+      ok(/forbidden/.test((await fails(q, "select public.admin_overview()")) ?? ""), "admin overview is admin-only")
+      ok(/forbidden/.test((await fails(q, "select * from public.admin_places()")) ?? ""), "admin places is admin-only")
+    }, true)
+    await as(c, U.girl, async (q) => {
+      ok((await q("select count(*)::int n from public.place_applications")).rows[0].n === 0, "others cannot see my application")
+      ok(/slug_taken/.test((await fails(q, "select public.apply_for_place('Copy', 'new-mess-test', 'mess', 'Vizag')")) ?? ""), "nobody else can apply for a reserved slug")
+    })
+    await as(c, U.admin, async (q) => {
+      ok((await q("select count(*)::int n from public.admin_applications('pending') where slug = 'new-mess-test'")).rows[0].n === 1, "admin sees pending applications")
+      ok((await q("select (public.admin_overview()->>'applications_pending')::int n")).rows[0].n >= 1, "admin overview counts pending applications")
+      ok(/reason_required/.test((await fails(q, "select public.admin_decide_application($1, 'reject', '')", [appId])) ?? ""), "rejecting needs a reason")
+      const r = (await q("select public.admin_decide_application($1, 'approve') r", [appId])).rows[0].r
+      ok(r.status === "approved" && r.tenant_id, "admin approval provisions the business")
+      ok((await q("select count(*)::int n from public.categories where tenant_id = $1", [r.tenant_id])).rows[0].n === 0, "admin still cannot read the new tenant's finance setup")
+      ok(/already_decided/.test((await fails(q, "select public.admin_decide_application($1, 'approve')", [appId])) ?? ""), "an application is decided once")
+    }, true)
+    await as(c, U.outsider, async (q) => {
+      const ctx = (await q("select public.my_context() c")).rows[0].c
+      const t = ctx.staff.find((s: { slug: string }) => s.slug === "new-mess-test")
+      ok(t?.role === "owner", "the applicant owns the approved place")
+      ok((await q("select count(*)::int n from public.plans where tenant_id = $1 and price_paise = 250000", [t?.tenant_id])).rows[0].n === 1, "the applied plan is created")
+      ok((await q("select count(*)::int n from public.categories where tenant_id = $1", [t?.tenant_id])).rows[0].n > 0, "the preset is applied")
+    })
+    await as(c, U.ownerA, async (q) => {
+      const id = (await q("select public.apply_for_place('Second Place', 'second-place-x', 'tiffin', 'Vizag') id")).rows[0].id
+      await q("select public.withdraw_application($1)", [id])
+      ok((await q("select public.slug_available('second-place-x') v")).rows[0].v === true, "withdrawing frees the slug")
+      ok(/not_found/.test((await fails(q, "select public.withdraw_application($1)", [id])) ?? ""), "withdraw only pending applications")
+    })
+    // clean up the committed rows so later sections see the seed only
+    await c.query("delete from public.place_applications where slug = 'new-mess-test'")
+    await c.query("set session_replication_role = replica")
+    await c.query("delete from public.tenants where slug = 'new-mess-test'")
+    await c.query("set session_replication_role = default")
+  }
+
+  // ── 10c. admins by e-mail (platform_settings.admin_emails)
+  await c.query("begin")
+  await c.query("update auth.users set email_confirmed_at = now() where id = $1", [U.girl])
+  await c.query("update public.platform_settings set value = jsonb_build_array((select lower(email) from auth.users where id = $1)) where key = 'admin_emails'", [U.girl])
+  await c.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify({ sub: U.girl, role: "authenticated" })])
+  await c.query("set local role authenticated")
+  ok((await c.query("select public.is_platform_admin() v")).rows[0].v === false, "not an admin before login")
+  await c.query("select public.link_my_memberships()")
+  ok((await c.query("select public.is_platform_admin() v")).rows[0].v === true, "listed confirmed e-mail becomes admin on login")
+  await c.query("rollback")
 
   // ── 11. suspended tenant disappears and stops working
   await as(c, U.admin, async (q) => {

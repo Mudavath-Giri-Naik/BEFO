@@ -1,10 +1,12 @@
-import { ArrowUpRight, Moon, Search, Sun } from "lucide-react"
+import { ArrowUpRight, LogOut, Moon, Search, Sun, UserRound } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useLocation } from "react-router"
 import { Logo } from "@/components/befo/logo"
 import { useTheme } from "@/app/theme"
+import { homeFor } from "@/features/auth/home"
+import { useAuth } from "@/features/auth/session"
 import { LanguageToggle } from "@/components/layout/toggles"
 import { cn } from "@/lib/utils"
 import { photo } from "./media"
@@ -26,6 +28,9 @@ export function SiteNav() {
   const loc = useLocation()
   const reduce = useReducedMotion()
   const { resolved, theme, setTheme } = useTheme()
+  const { user, context, signOut } = useAuth()
+  const home = homeFor(context)
+  const initial = ((user?.user_metadata?.full_name as string | undefined) ?? user?.email ?? "?").trim()[0]?.toUpperCase()
   const dark = resolved === "dark"
   const panel = useRef<HTMLDivElement>(null)
   const [prevPath, setPrevPath] = useState(loc.pathname)
@@ -44,7 +49,15 @@ export function SiteNav() {
       <div className="relative mx-auto flex max-w-[1200px] items-center justify-between px-4 sm:px-6">
         <div className="flex h-12 items-center rounded-full border border-foreground/12 bg-background/70 px-5 backdrop-blur-md min-[380px]:h-14 min-[380px]:px-6"><Logo /></div>
         <div className="flex items-center gap-2 sm:gap-2.5">
-          <button type="button" onClick={() => setTheme(dark ? "light" : "dark")} className={circle}
+          {user ? (
+            <Link to={home} className={cn(circle, "text-[17px] font-semibold")} aria-label="Your account" title="Your account">{initial}</Link>
+          ) : (
+            <>
+              <Link to="/login" className={cn(circle, "sm:hidden")} aria-label={t("nav.login")} title={t("nav.login")}><UserRound className="size-[20px]" strokeWidth={1.6} /></Link>
+              <Link to="/login" className="hidden h-14 items-center rounded-full border border-foreground/12 bg-background/70 px-5 text-[15px] font-medium backdrop-blur-md transition-colors hover:bg-card sm:inline-flex">{t("nav.login")}</Link>
+            </>
+          )}
+          <button type="button" onClick={() => setTheme(dark ? "light" : "dark")} className={cn(circle, "max-sm:hidden")}
             aria-label={dark ? "Switch to light theme" : "Switch to dark theme"} title={dark ? "Light theme" : "Dark theme"}>
             <span className="relative block size-5" aria-hidden>
               <Sun className={cn("absolute inset-0 size-5 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]", dark ? "rotate-90 scale-50 opacity-0" : "rotate-0 scale-100 opacity-100")} strokeWidth={1.6} />
@@ -85,7 +98,18 @@ export function SiteNav() {
                 <span className="relative flex h-full items-center justify-center gap-2 text-[26px] font-medium text-white">Find a place <ArrowUpRight className="size-7 transition-transform duration-500 group-hover:rotate-45" strokeWidth={1.5} /></span>
               </Link>
               <div className="mt-3 flex items-center justify-between gap-2 px-1">
-                <Link to="/login" className="inline-flex h-11 items-center rounded-full px-4 text-[15px] font-medium whitespace-nowrap hover:bg-muted">{t("nav.login")}</Link>
+                {user ? (
+                  <span className="flex items-center gap-1">
+                    <Link to={home} className="inline-flex h-11 items-center rounded-full px-4 text-[15px] font-medium whitespace-nowrap hover:bg-muted">
+                      {context?.is_platform_admin ? "Admin" : "Your home"}
+                    </Link>
+                    <button type="button" onClick={() => signOut()} className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 text-[15px] text-muted-foreground hover:bg-muted hover:text-foreground">
+                      <LogOut className="size-4" aria-hidden />Log out
+                    </button>
+                  </span>
+                ) : (
+                  <Link to="/login" className="inline-flex h-11 items-center rounded-full px-4 text-[15px] font-medium whitespace-nowrap hover:bg-muted">{t("nav.login")}</Link>
+                )}
                 <LanguageToggle />
               </div>
               <div role="radiogroup" aria-label="Theme" className="mt-2 grid grid-cols-3 rounded-full border border-foreground/12 p-1">

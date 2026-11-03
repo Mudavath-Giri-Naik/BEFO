@@ -12,6 +12,8 @@ const ForOwnersPage = lazy(() => import("@/features/marketing/for-owners"))
 const LoginPage = lazy(() => import("@/features/auth/login"))
 const JoinPage = lazy(() => import("@/features/customer/join"))
 const ListYourPlace = lazy(() => import("@/features/onboarding-owner/wizard"))
+const MyHome = lazy(() => import("@/features/customer/home"))
+const AdminRoutes = lazy(() => import("@/features/admin/admin"))
 const AppIndex = lazy(() => import("@/features/owner/routes").then((m) => ({ default: m.AppIndex })))
 const AppPlace = lazy(() => import("@/features/owner/routes").then((m) => ({ default: m.AppPlace })))
 const DemoOwner = lazy(() => import("@/features/owner/routes").then((m) => ({ default: m.DemoOwner })))
@@ -51,10 +53,11 @@ const routes: RouteObject[] = [
       { path: "/privacy", element: <LegalPage page="privacy" /> },
       { path: "/terms", element: <LegalPage page="terms" /> },
       { path: "/about", element: <LegalPage page="about" /> },
+      { path: "/me", element: guard(<MyHome />) },
       { path: "/me/*", element: guard(<BuildingPage title="My places" phase="Phase 6" ownerCta />) },
       { path: "/app", element: guard(<AppIndex />) },
       { path: "/app/:slug/*", element: guard(<AppPlace />) },
-      { path: "/admin/*", element: guard(<BuildingPage title="Platform admin" phase="Phase 10" />) },
+      { path: "/admin/*", element: guard(<AdminRoutes />) },
       { path: "*", element: <NotFoundPage /> },
     ],
   },
