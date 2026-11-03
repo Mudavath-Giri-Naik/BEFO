@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
-import { Hammer, Info } from "lucide-react"
+import { Hammer } from "lucide-react"
 import { Link, Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -49,11 +48,16 @@ function PlaceSwitcher() {
   const { slug } = useParams()
   const demo = useLocation().pathname.startsWith("/demo")
   const ctx = useQuery({ queryKey: ["owner-places", demo], queryFn: () => (demo ? demoOwnerApi : supabaseOwnerApi).places() })
-  if (!ctx.data || ctx.data.length < 2) return null
+  const current = ctx.data?.find((p) => p.slug === slug)
+  if (!ctx.data || ctx.data.length < 2) return <span className="block truncate">{current?.name ?? ""}</span>
   const base = demo ? "/demo" : "/app"
+  // the place name itself is the switcher
   return (
     <Select value={slug} onValueChange={(v) => nav(`${base}/${v}`)}>
-      <SelectTrigger className="mt-2 h-10 w-full" aria-label="Switch place"><SelectValue /></SelectTrigger>
+      <SelectTrigger aria-label="Switch place"
+        className="h-auto w-auto max-w-full min-w-0 gap-1.5 *:data-[slot=select-value]:block *:data-[slot=select-value]:min-w-0 *:data-[slot=select-value]:truncate border-0 bg-transparent p-0 text-[length:inherit] leading-tight font-[inherit] tracking-[inherit] shadow-none focus-visible:ring-0 [&_svg]:size-5 [&_svg]:opacity-60 data-[size=default]:h-auto">
+        <SelectValue />
+      </SelectTrigger>
       <SelectContent>{ctx.data.map((p) => <SelectItem key={p.slug} value={p.slug}>{p.name}</SelectItem>)}</SelectContent>
     </Select>
   )
@@ -104,9 +108,6 @@ export function AppPlace() {
 export function DemoOwner() {
   return (
     <>
-      <div data-demo-banner className="mx-auto max-w-6xl px-4 pt-4">
-        <Alert><Info className="size-4" /><AlertDescription>Demo data. Try anything — nothing is saved.</AlertDescription></Alert>
-      </div>
       <PlaceLoader api={demoOwnerApi} base="/demo" />
     </>
   )

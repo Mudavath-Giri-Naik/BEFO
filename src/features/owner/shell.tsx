@@ -27,9 +27,8 @@ export function OwnerShell({ switcher }: { switcher?: React.ReactNode }) {
       <aside className="hidden w-56 shrink-0 md:block" aria-label="Owner menu">
         <div className="sticky top-20 space-y-4">
           <div>
-            <p className="text-xs text-muted-foreground">{api.readOnly ? "Demo place" : tenant.role === "owner" ? "Owner" : "Manager"}</p>
-            <p className="font-display text-lg leading-tight font-bold">{tenant.name}</p>
-            {switcher}
+            <RoleLine readOnly={api.readOnly} role={tenant.role} />
+            <div className="mt-1 text-[20px] leading-tight tracking-[-0.02em]">{switcher ?? tenant.name}</div>
           </div>
           <nav className="space-y-1">
             {nav.map((n) => (
@@ -43,10 +42,9 @@ export function OwnerShell({ switcher }: { switcher?: React.ReactNode }) {
         </div>
       </aside>
       <div className="min-w-0 flex-1">
-        <div className="mb-4 md:hidden">
-          <p className="text-xs text-muted-foreground">{api.readOnly ? "Demo place" : tenant.role === "owner" ? "Owner" : "Manager"}</p>
-          <p className="font-display text-xl font-bold">{tenant.name}</p>
-          {switcher}
+        <div className="mb-5 md:hidden">
+          <RoleLine readOnly={api.readOnly} role={tenant.role} />
+          <div className="mt-1 text-[24px] leading-tight tracking-[-0.03em]">{switcher ?? tenant.name}</div>
         </div>
         <Outlet />
       </div>
@@ -60,6 +58,15 @@ export function OwnerShell({ switcher }: { switcher?: React.ReactNode }) {
         <BottomLink {...nav[nav.length - 1]} />
       </nav>
     </div>
+  )
+}
+
+function RoleLine({ readOnly, role }: { readOnly: boolean; role: "owner" | "manager" }) {
+  return (
+    <p className="flex items-center gap-2 text-[13px] text-muted-foreground">
+      {readOnly ? "Demo place" : role === "owner" ? "Owner" : "Manager"}
+      {readOnly && <span className="inline-flex h-6 items-center gap-1.5 rounded-full bg-brand-soft px-2.5 text-[12px] text-brand-strong"><span className="size-1.5 rounded-full bg-brand" />Nothing is saved</span>}
+    </p>
   )
 }
 

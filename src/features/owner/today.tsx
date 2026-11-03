@@ -17,7 +17,7 @@ export default function TodayPage() {
   const label = tenant.type === "hostel" ? "residents" : "members"
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Today <span className="text-base font-normal text-muted-foreground">· {formatDateHuman(d.today)}</span></h1>
+      <h1 className="text-[28px] leading-tight tracking-[-0.03em]">Today <span className="text-base font-normal text-muted-foreground">· {formatDateHuman(d.today)}</span></h1>
 
       {inbox > 0 ? (
         <Link to={`${base}/inbox`} className="flex items-center gap-4 rounded-2xl border-2 border-primary/30 bg-card p-4 outline-none hover:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/50">

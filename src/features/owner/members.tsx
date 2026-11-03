@@ -1,15 +1,15 @@
 import { useQueryClient } from "@tanstack/react-query"
-import { Banknote, MessageCircle, Phone, Search } from "lucide-react"
+import { Banknote, ChevronRight, MessageCircle, Phone, Plus, Search } from "lucide-react"
 import { useMemo, useState, type ReactNode } from "react"
 import { useSearchParams } from "react-router"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
+import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { formatDateHuman, tenantToday } from "@/lib/dates"
 import { formatRupees, parseIndianAmount } from "@/lib/money"
@@ -30,7 +30,9 @@ export default function MembersPage() {
   const filter = (sp.get("status") as Filter) in FILTERS ? (sp.get("status") as Filter) : "all"
   const [q, setQ] = useState("")
   const [paying, setPaying] = useState<MemberRow | null>(null)
+  const [open, setOpen] = useState<MemberRow | null>(null)
   const members = useOwnerQuery("members", (a, t) => a.members(t))
+  const plans = useOwnerQuery("plans", (a, t) => a.plans(t))
   const plural = tenant.type === "hostel" ? "Residents" : "Members"
   usePageMeta({ title: `${plural} · ${tenant.name}` })
   const list = useMemo(() => {
@@ -38,78 +40,124 @@ export default function MembersPage() {
     return (members.data ?? []).filter((m) => match(filter, m) && (!s || m.name.toLowerCase().includes(s) || m.phone.includes(s) || m.code.toLowerCase() === s))
       .sort((a, b) => (a.days_left ?? -999) - (b.days_left ?? -999))
   }, [members.data, filter, q])
+  const price = (m: MemberRow) => plans.data?.find((p) => p.id === m.plan_id)?.price_paise
+  const setFilter = (f: Filter) => { const n = new URLSearchParams(sp); if (f === "all") n.delete("status"); else n.set("status", f); setSp(n, { replace: true }) }
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-bold">{plural} <span className="text-base font-normal text-muted-foreground">{members.data?.length ?? ""}</span></h1>
-        <AddMemberDialog trigger={<Button variant="outline" className="h-11">Add</Button>} />
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-[28px] leading-none tracking-[-0.03em]">{plural} <span className="text-[18px] text-muted-foreground tabular-nums">{members.data?.length ?? ""}</span></h1>
+        <AddMemberDialog trigger={<button type="button" aria-label={`Add ${plural.toLowerCase().slice(0, -1)}`} className="flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground"><Plus className="size-5" /></button>} />
       </div>
       <div className="relative">
-        <Search className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
-        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, phone or code" aria-label="Search" className="h-12 pl-10" />
+        <Search className="pointer-events-none absolute top-1/2 left-4 size-[18px] -translate-y-1/2 text-muted-foreground" strokeWidth={1.75} aria-hidden />
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, phone or code" aria-label="Search" className="h-12 rounded-full bg-card pl-11 text-[16px]" />
       </div>
-      <ToggleGroup type="single" variant="outline" value={filter} onValueChange={(v) => { const n = new URLSearchParams(sp); if (!v || v === "all") n.delete("status"); else n.set("status", v); setSp(n, { replace: true }) }} className="flex-wrap justify-start">
-        {(Object.keys(FILTERS) as Filter[]).map((f) => <ToggleGroupItem key={f} value={f} className="h-10 px-3">{FILTERS[f]} {members.data && <span className="ml-1 text-muted-foreground">{members.data.filter((m) => match(f, m)).length}</span>}</ToggleGroupItem>)}
-      </ToggleGroup>
+      <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:px-0">
+        <div role="radiogroup" aria-label="Status" className="flex w-max gap-2">
+          {(Object.keys(FILTERS) as Filter[]).map((f) => (
+            <button key={f} type="button" role="radio" aria-checked={filter === f} onClick={() => setFilter(f)}
+              className={cn("inline-flex h-9 items-center gap-1.5 rounded-full border px-4 text-[14px] whitespace-nowrap transition-colors",
+                filter === f ? "border-primary bg-primary text-primary-foreground" : "border-foreground/12 text-muted-foreground hover:text-foreground")}>
+              {FILTERS[f]}{members.data && <span className={cn("tabular-nums", filter === f ? "opacity-70" : "opacity-60")}>{members.data.filter((m) => match(f, m)).length}</span>}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {members.isLoading ? <Skeleton className="h-64" /> : list.length === 0 ? (
-        <div className="rounded-xl border border-dashed p-10 text-center text-muted-foreground">{members.data?.length ? "Nobody matches." : `No ${plural.toLowerCase()} yet. Add people or import your list.`}</div>
+      {members.isLoading ? <Skeleton className="h-72 rounded-[24px]" /> : list.length === 0 ? (
+        <div className="rounded-[24px] border border-dashed p-10 text-center text-muted-foreground">{members.data?.length ? "Nobody matches." : `No ${plural.toLowerCase()} yet. Add people or import your list.`}</div>
       ) : (
-        <>
-          {/* phone: cards */}
-          <ul className="space-y-2 md:hidden">
+        <div className="overflow-hidden rounded-[24px] border border-foreground/12 bg-card">
+          {/* header row (tablet and up) */}
+          <div className="hidden grid-cols-[minmax(0,2.2fr)_1fr_1.1fr_auto] items-center gap-4 border-b border-foreground/10 px-5 py-3 text-[13px] text-muted-foreground md:grid">
+            <span>Name</span><span>{tenant.type === "hostel" ? "Room" : "Code"}</span><span>Due</span><span className="w-[220px] text-right">Status & actions</span>
+          </div>
+          <ul className="divide-y divide-foreground/10">
             {list.map((m) => (
-              <li key={m.member_id} className="rounded-xl border bg-card p-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="truncate font-bold">{m.name}</p>
-                    <p className="text-sm text-muted-foreground">{m.room_label ? `Room ${m.room_label} · ` : ""}{m.due_on ? `Due ${formatDateHuman(m.due_on)}` : "No payment yet"}</p>
+              <li key={m.member_id} className="group relative grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 md:grid-cols-[minmax(0,2.2fr)_1fr_1.1fr_auto] md:gap-4 md:px-5">
+                {/* whole row opens the person's sheet */}
+                <button type="button" onClick={() => setOpen(m)} className="absolute inset-0 outline-none focus-visible:bg-muted/60 hover:bg-muted/40" aria-label={`Open ${m.name}`} />
+                <div className="pointer-events-none relative flex min-w-0 items-center gap-3 md:col-auto">
+                  <Avatar name={m.name} status={m.sub_status} />
+                  <div className="min-w-0 md:hidden">
+                    <p className="truncate text-[15px] font-medium">{m.name}</p>
+                    <p className="truncate text-[13px] text-muted-foreground">{m.room_label ? `Room ${m.room_label} · ` : ""}{m.due_on ? `Due ${formatDateHuman(m.due_on)}` : "No payment yet"}</p>
                   </div>
-                  <StatusBadge status={m.sub_status} daysLeft={m.days_left} />
+                  <div className="hidden min-w-0 md:block">
+                    <p className="truncate text-[15px] font-medium">{m.name}</p>
+                    <p className="truncate text-[13px] text-muted-foreground tabular-nums">{formatPhone(m.phone)}</p>
+                  </div>
                 </div>
-                <RowActions m={m} onPay={() => setPaying(m)} />
+                <span className="pointer-events-none relative hidden text-[14px] tabular-nums md:block">{tenant.type === "hostel" ? (m.room_label ?? "—") : <span className="font-mono text-[13px]">{m.code}</span>}</span>
+                <span className="pointer-events-none relative hidden text-[14px] tabular-nums md:block">{m.due_on ? formatDateHuman(m.due_on) : "—"}</span>
+                <div className="pointer-events-none relative flex items-center justify-end gap-1.5 md:w-[220px] [&>a]:pointer-events-auto [&>button]:pointer-events-auto">
+                  <span className="pointer-events-none"><StatusBadge status={m.sub_status} daysLeft={m.days_left} /></span>
+                  {/* laptop: quiet inline actions */}
+                  <button type="button" onClick={() => setPaying(m)} className="hidden h-9 items-center gap-1.5 rounded-full border border-foreground/12 px-3 text-[13px] hover:bg-muted md:inline-flex">
+                    <Banknote className="size-4" strokeWidth={1.75} />Paid
+                  </button>
+                  <a href={`tel:${m.phone}`} aria-label={`Call ${m.name}`} className="hidden size-9 items-center justify-center rounded-full hover:bg-muted md:flex"><Phone className="size-4" strokeWidth={1.75} /></a>
+                  <ChevronRight className="pointer-events-none size-4 text-muted-foreground md:hidden" aria-hidden />
+                </div>
               </li>
             ))}
           </ul>
-          {/* laptop: table */}
-          <div className="hidden overflow-hidden rounded-xl border bg-card md:block">
-            <Table>
-              <TableHeader><TableRow><TableHead>Name</TableHead>{tenant.type === "hostel" && <TableHead>Room</TableHead>}<TableHead>Due</TableHead><TableHead>Status</TableHead><TableHead>Code</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
-              <TableBody>
-                {list.map((m) => (
-                  <TableRow key={m.member_id}>
-                    <TableCell><p className="font-semibold">{m.name}</p><p className="text-xs text-muted-foreground">{formatPhone(m.phone)}</p></TableCell>
-                    {tenant.type === "hostel" && <TableCell>{m.room_label ?? "—"}</TableCell>}
-                    <TableCell className="tabular-nums">{m.due_on ? formatDateHuman(m.due_on) : "—"}</TableCell>
-                    <TableCell><StatusBadge status={m.sub_status} daysLeft={m.days_left} /></TableCell>
-                    <TableCell className="font-mono text-sm">{m.code}</TableCell>
-                    <TableCell className="text-right"><RowActions m={m} onPay={() => setPaying(m)} compact /></TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </>
+        </div>
       )}
+      <MemberSheet member={open} price={open ? price(open) : undefined} onClose={() => setOpen(null)} onPay={(m) => { setOpen(null); setPaying(m) }} />
       <MarkPaidDrawer member={paying} onClose={() => setPaying(null)} />
     </div>
   )
 }
 
-function RowActions({ m, onPay, compact }: { m: MemberRow; onPay: () => void; compact?: boolean }) {
+const AVATAR_TONE: Record<string, string> = {
+  active: "bg-leaf-soft text-leaf", expiring_soon: "bg-turmeric-soft text-accent-foreground",
+  expired: "bg-destructive/12 text-destructive", no_payment: "bg-destructive/12 text-destructive",
+}
+function Avatar({ name, status }: { name: string; status: string }) {
+  const initials = name.split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase()
+  return <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold", AVATAR_TONE[status] ?? "bg-muted text-muted-foreground")} aria-hidden>{initials}</span>
+}
+
+/** Everything about one person, with the actions: opened by tapping their row. */
+function MemberSheet({ member: m, price, onClose, onPay }: { member: MemberRow | null; price?: number; onClose: () => void; onPay: (m: MemberRow) => void }) {
   const { tenant } = useOwner()
-  const plans = useOwnerQuery("plans", (a, t) => a.plans(t))
-  const price = plans.data?.find((p) => p.id === m.plan_id)?.price_paise
+  if (!m) return null
+  const due = m.sub_status === "expired" || m.sub_status === "expiring_soon" || m.sub_status === "no_payment"
   const reminder = `Hi ${m.name.split(" ")[0]}, your ${tenant.name} fee${price ? ` of ${formatRupees(price)}` : ""} ${m.sub_status === "expired" ? `was due on ${m.due_on ? formatDateHuman(m.due_on) : "earlier"}` : `is due on ${m.due_on ? formatDateHuman(m.due_on) : "soon"}`}. Please pay and write ${m.code} in the UPI note. Thank you!`
+  const facts: [string, string][] = [
+    ["Phone", formatPhone(m.phone)], ["Member code", m.code],
+    ["Plan", price ? `${formatRupees(price)} / month` : "—"],
+    ["Due on", m.due_on ? formatDateHuman(m.due_on) : "No payment yet"],
+    ["Last paid", m.last_paid_on ? formatDateHuman(m.last_paid_on) : "—"],
+    ...(m.room_label ? [["Room", m.room_label] as [string, string]] : []),
+    ...(m.deposit_held_paise ? [["Deposit held", formatRupees(m.deposit_held_paise)] as [string, string]] : []),
+  ]
   return (
-    <div className={compact ? "inline-flex gap-1" : "mt-2 flex gap-2"}>
-      <Button variant={compact ? "ghost" : "default"} className={compact ? "h-10" : "h-11 flex-1"} onClick={onPay}><Banknote className="size-4" />Mark paid</Button>
-      <Button asChild variant="ghost" size="icon" className="size-11" aria-label={`Call ${m.name}`}><a href={`tel:${m.phone}`}><Phone className="size-5" /></a></Button>
-      {(m.sub_status === "expired" || m.sub_status === "expiring_soon" || m.sub_status === "no_payment") && (
-        <Button asChild variant="ghost" size="icon" className="size-11" aria-label={`WhatsApp reminder to ${m.name}`}><a href={waLink(m.phone, reminder)} target="_blank" rel="noopener noreferrer"><MessageCircle className="size-5" /></a></Button>
-      )}
-    </div>
+    <Drawer open onOpenChange={(o) => !o && onClose()}>
+      <DrawerContent>
+        <div className="mx-auto w-full max-w-md px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <DrawerHeader className="flex flex-row items-center gap-3 px-0 text-left">
+            <Avatar name={m.name} status={m.sub_status} />
+            <div className="min-w-0 flex-1">
+              <DrawerTitle className="truncate text-[20px] font-medium">{m.name}</DrawerTitle>
+              <DrawerDescription className="mt-0.5"><StatusBadge status={m.sub_status} daysLeft={m.days_left} /></DrawerDescription>
+            </div>
+          </DrawerHeader>
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-[20px] border border-foreground/10 p-4">
+            {facts.map(([k, v]) => (
+              <div key={k} className="min-w-0"><dt className="text-[12px] text-muted-foreground">{k}</dt><dd className="truncate text-[15px] tabular-nums">{v}</dd></div>
+            ))}
+          </dl>
+          <Button size="lg" className="mt-4 h-12 w-full rounded-full text-[15px]" onClick={() => onPay(m)}><Banknote className="size-5" />Mark paid</Button>
+          <div className={cn("mt-2 grid gap-2", due ? "grid-cols-2" : "grid-cols-1")}>
+            <Button asChild variant="outline" className="h-12 rounded-full"><a href={`tel:${m.phone}`}><Phone className="size-4" />Call</a></Button>
+            {due && <Button asChild variant="outline" className="h-12 rounded-full"><a href={waLink(m.phone, reminder)} target="_blank" rel="noopener noreferrer"><MessageCircle className="size-4" />Remind on WhatsApp</a></Button>}
+          </div>
+        </div>
+      </DrawerContent>
+    </Drawer>
   )
 }
 

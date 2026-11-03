@@ -7,7 +7,7 @@ test("home → explore → search → place page", async ({ page }) => {
   await page.getByRole("link", { name: "Find a place" }).first().click()
   await expect(page).toHaveURL(/\/explore/)
   await page.getByRole("combobox", { name: "Area, college or city" }).fill("Madhurawada")
-  await page.getByRole("button", { name: /search/i }).click()
+  await page.getByRole("combobox", { name: "Area, college or city" }).press("Enter")
   await expect(page).toHaveURL(/explore\?q=Madhurawada/)
   await page.getByRole("link", { name: "Sri Lakshmi Ladies Hostel" }).click()
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Sri Lakshmi Ladies Hostel")

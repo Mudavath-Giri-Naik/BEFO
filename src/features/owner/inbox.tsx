@@ -28,7 +28,7 @@ export default function InboxPage() {
   const empty = !loading && !req.data?.length && !claims.data?.length
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold">Inbox</h1>
+      <h1 className="text-[28px] leading-tight tracking-[-0.03em]">Inbox</h1>
       {loading && <Skeleton className="h-40" />}
       {empty && <div className="rounded-xl border border-dashed p-10 text-center"><p className="text-lg font-semibold">Nothing waiting.</p><p className="text-muted-foreground">New join requests and payments show up here.</p></div>}
       {!!claims.data?.length && <ClaimsSection claims={claims.data} />}
