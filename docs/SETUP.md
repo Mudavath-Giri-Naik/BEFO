@@ -21,16 +21,39 @@ Everything below is in simple steps. You can run the app **today** with no accou
 2. Run `/mcp` and check `shadcn` shows **Connected**.
 3. Ask Claude: "install one Animate UI component and fix the registry URL in components.json if needed".
 
-### G2 — Supabase + Google
-1. supabase.com → create **two** projects: `befo-dev` and `befo-prod` (region: Mumbai).
-2. For each: copy Project URL and the **publishable** + **secret** keys (Settings → API Keys) into `.env` (see the comments there).
-3. Install the CLI: `pnpm dlx supabase login`, then `pnpm dlx supabase link --project-ref <ref>`.
-4. `pnpm dlx supabase db push` (runs every migration). For dev data: run `supabase/seed/seed.sql` in the SQL editor.
-5. Google sign-in: follow the steps above `GOOGLE_OAUTH_CLIENT_ID` in `.env`.
-6. Set `VITE_DATA_SOURCE=supabase`, restart `pnpm dev`.
+### G2 — Supabase + Google ✅ (project `jplbjlfxrklvznmmrskh`, eu-central-1, done 2026-11-03)
+One real project for now (a separate dev project can come later). What was done, so it can be repeated:
+1. `.env`: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (the `sb_secret_…` key), `SUPABASE_PROJECT_REF`,
+   `SUPABASE_ACCESS_TOKEN` (supabase.com/dashboard/account/tokens) and optionally `SUPABASE_DB_URL`
+   (Connect → **Session pooler** URI; the direct `db.<ref>.supabase.co` host is IPv6-only).
+2. Migrations: `pnpm db:migrate --dry-run`, then `pnpm db:migrate --api` (or without `--api` when
+   `SUPABASE_DB_URL` works). It applies only pending files and records them like the Supabase CLI.
+   **Never run `supabase/seed/seed.sql` on this project** — it creates fake users and tenants.
+3. Keys: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` and `SUPABASE_ANON_KEY` = the **publishable** key; `VITE_DATA_SOURCE=supabase`.
+4. Google: provider enabled in Supabase; Google Cloud OAuth client has the redirect URI
+   `https://jplbjlfxrklvznmmrskh.supabase.co/auth/v1/callback` (verified: Google accepts it).
+5. Authentication → URL Configuration: **Site URL** `http://localhost:5173` for now (switch to the Vercel address
+   at G4) and **Redirect URLs** `http://localhost:5173/**`, `http://localhost:5174/**` (+ the Vercel address at G4).
 
-### G3 — MSG91 + DLT (takes 1–3 days, start early)
-Follow the steps above `MSG91_AUTH_KEY` in `.env`. Until then `SMS_DRIVER=console` prints OTPs in the function logs.
+### G3 — Phone OTP (now: console driver · later: MSG91 + DLT, 1–3 days, start early)
+Every signed-in user must verify a phone. Until MSG91 is ready the Send SMS hook runs in **console mode**:
+- `sms-hook` is deployed without JWT check:
+  `pnpm dlx supabase functions deploy sms-hook --no-verify-jwt --use-api --project-ref jplbjlfxrklvznmmrskh`
+- Edge Function secrets: `SEND_SMS_HOOK_SECRET` (`v1,whsec_…`, same value as in `.env` and in the hook config),
+  `SMS_DRIVER=console`, `ALLOW_CONSOLE_SMS_IN_PROD=1`.
+- Authentication → Hooks → **Send SMS** = HTTPS `https://jplbjlfxrklvznmmrskh.supabase.co/functions/v1/sms-hook`
+  with the same secret; Sign In / Providers → **Phone** enabled.
+- Codes appear in Edge Functions → `sms-hook` → **Logs** (`DEV OTP for +91 98•••••10: 123456`). For your own
+  number, add a **test phone number** with a fixed code (Phone provider → Test phone numbers, format
+  `91XXXXXXXXXX=123456`): Supabase accepts that code without calling the hook at all.
+
+**Switch to MSG91 when DLT is approved:**
+1. Fill `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID` (and sender/DLT ids) in `.env` — steps above `MSG91_AUTH_KEY`.
+2. Edge Function secrets: set `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`, `SMS_DRIVER=msg91`, and **delete
+   `ALLOW_CONSOLE_SMS_IN_PROD`** (Edge Functions → Secrets, or `pnpm env:push-supabase` after removing it from `.env`).
+   With the flag gone, a hosted project refuses to print codes even if `SMS_DRIVER` falls back to console.
+3. Remove your test phone number (or keep it only on a dev project) so every real login gets a real SMS.
+4. Log in with a phone that is *not* a test number and confirm the SMS arrives; `public.sms_log` shows `sent`.
 
 ### G4 — Vercel (hosting)
 1. vercel.com → **Add New → Project** → import `Mudavath-Giri-Naik/BEFO`. Framework preset **Vite**; build
