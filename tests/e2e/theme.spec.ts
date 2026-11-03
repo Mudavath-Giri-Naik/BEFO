@@ -18,3 +18,12 @@ test("menu offers light, dark and system", async ({ page }) => {
   await expect(page.locator("html")).toHaveClass(/dark/)
   await expect(page.getByRole("radio", { name: "dark" })).toHaveAttribute("aria-checked", "true")
 })
+
+test("footer shows on the home page only", async ({ page }) => {
+  await page.goto("/")
+  await expect(page.getByRole("contentinfo")).toHaveCount(1)
+  for (const path of ["/explore", "/p/annapurna-mess", "/for-owners", "/login", "/demo/demo-mess"]) {
+    await page.goto(path)
+    await expect(page.getByRole("contentinfo"), path).toHaveCount(0)
+  }
+})

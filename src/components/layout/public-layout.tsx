@@ -39,10 +39,11 @@ export function PublicLayout() {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground">Skip to content</a>
       <SmoothScroll />
       <SiteNav />
-      <main id="main" className={cn("flex-1", !home && "pt-[96px]")}>
+      <main id="main" className={cn("flex-1", !home && "pt-[96px] pb-16")}>
         <Suspense fallback={<PageFallback />}><Outlet /></Suspense>
       </main>
-      <SiteFooter />
+      {/* the big footer belongs to the home page only; inner pages end with their own content */}
+      {home && <SiteFooter />}
       <DemoBanner />
     </div>
   )
