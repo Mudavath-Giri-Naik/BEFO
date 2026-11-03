@@ -57,7 +57,7 @@ function bed(x: number, y: number, w: number, top = false) {
 function roomScene(seed: number, bunks: boolean) {
   const b = base(seed)
   const winX = seed % 2 ? 140 : 700
-  let furniture = ""
+  let furniture: string
   if (bunks) {
     const x = seed % 2 ? 560 : 120
     furniture = `<rect x="${x}" y="250" width="14" height="440" fill="#2f2f33"/><rect x="${x + 506}" y="250" width="14" height="440" fill="#2f2f33"/>
