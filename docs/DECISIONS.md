@@ -42,3 +42,9 @@ Format: date · decision · why. Anything the spec asked for that could not be v
 - **Photos:** marketing sections use Unsplash photos (Unsplash licence: free, no attribution needed), hot-linked from images.unsplash.com (added to the CSP `img-src`). In **demo mode only**, example listings also use these photos; real listings show the owner's photos or a neutral drawn cover — never a stock photo, so a place is never misrepresented.
 - **Honest social proof:** no invented ratings, reviews or customer faces. The hero stats card shows the live "beds free today" count; the avatar row shows place-type icons instead of people.
 - **Known gap:** the new home-page copy is English only for now; Telugu strings for these sections are still to be added (Phase 12). `docs/screens/*` predate the redesign and will be regenerated after deploy (the build machine can't load the photos).
+
+## 2026-11-03 — Hosting on Vercel
+The owner deploys on Vercel, so `api/*.ts` (Edge Functions) + `vercel.json` (rewrites, security headers, CSP)
+mirror the Cloudflare Pages Functions in `functions/` (kept so either host works). `/p/:slug` gets its meta tags
+by string replacement on the shell instead of HTMLRewriter. Edge responses are cached by the Vercel CDN via
+`s-maxage`. The functions fall back to the `VITE_` variables so one set of env vars is enough.

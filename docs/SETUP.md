@@ -32,10 +32,21 @@ Everything below is in simple steps. You can run the app **today** with no accou
 ### G3 — MSG91 + DLT (takes 1–3 days, start early)
 Follow the steps above `MSG91_AUTH_KEY` in `.env`. Until then `SMS_DRIVER=console` prints OTPs in the function logs.
 
-### G4 — Cloudflare
-1. Pages project connected to the GitHub repo (build command `pnpm build`, output `dist`).
-2. Turnstile widget (steps above `VITE_TURNSTILE_SITE_KEY`).
-3. R2 bucket + token for backups (steps in group F).
+### G4 — Vercel (hosting)
+1. vercel.com → **Add New → Project** → import `Mudavath-Giri-Naik/BEFO`. Framework preset **Vite**; build
+   settings come from `vercel.json` (pnpm install, `pnpm build`, output `dist`). Leave Root Directory empty.
+2. **Environment Variables** (Production + Preview):
+   - `VITE_APP_NAME` = `BEFO`
+   - `VITE_DATA_SOURCE` = `supabase`
+   - `VITE_SUPABASE_URL` = your Project URL
+   - `VITE_SUPABASE_ANON_KEY` = the **publishable** key (`sb_publishable_…`) — never the secret key
+   - `VITE_APP_URL` = your site address, e.g. `https://befo.vercel.app` (no trailing slash)
+   - optional: `VITE_SUPPORT_WHATSAPP`, `VITE_SUPPORT_EMAIL`, `VITE_MAP_TILE_URL`
+   The `/api/*`, `/p/:slug` and `/sitemap.xml` edge functions read the same `VITE_` values.
+3. Deploy. Then in Supabase → Authentication → URL Configuration set **Site URL** to the Vercel address and add
+   `https://<your-domain>/**` to **Redirect URLs** (Google sign-in returns there).
+4. Custom domain later: Vercel → Settings → Domains, then repeat step 3 with the new address.
+5. Turnstile and R2 backups (Cloudflare) are still optional extras: steps above `VITE_TURNSTILE_SITE_KEY` and group F.
 
 ### G5 — GitHub
 Repo exists: github.com/Mudavath-Giri-Naik/BEFO. Keep it **private**. Add the group F keys as Actions secrets.
