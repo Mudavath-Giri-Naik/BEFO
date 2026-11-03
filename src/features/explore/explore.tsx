@@ -130,9 +130,19 @@ export default function ExplorePage({ presetType }: { presetType?: "hostel" | "m
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-80 rounded-xl" />)}</div>
           ) : items.length === 0 ? (
             <div className="rounded-xl border border-dashed p-10 text-center">
-              <p className="text-lg font-semibold">{t("explore.empty")}</p>
-              <p className="mt-1 text-muted-foreground">{t("explore.emptyHint")}</p>
-              {activeCount > 0 && <Button variant="outline" className="mt-4 h-11" onClick={() => setSp(new URLSearchParams())}><X className="size-4" />{t("explore.clear")}</Button>}
+              {[...sp.keys()].length === 0 ? (
+                <>
+                  <p className="text-lg font-semibold">{t("explore.emptyAll")}</p>
+                  <p className="mt-1 text-muted-foreground">{t("explore.emptyAllHint")}</p>
+                  <Button asChild variant="outline" className="mt-4 h-11 rounded-full"><Link to="/list-your-place">{t("explore.emptyAllCta")}</Link></Button>
+                </>
+              ) : (
+                <>
+                  <p className="text-lg font-semibold">{t("explore.empty")}</p>
+                  <p className="mt-1 text-muted-foreground">{t("explore.emptyHint")}</p>
+                  <Button variant="outline" className="mt-4 h-11 rounded-full" onClick={() => setSp(new URLSearchParams())}><X className="size-4" />{t("explore.clear")}</Button>
+                </>
+              )}
             </div>
           ) : view === "map" ? (
             <Suspense fallback={<Skeleton className="h-[60dvh] rounded-xl" />}>

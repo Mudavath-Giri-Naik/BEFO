@@ -44,7 +44,7 @@
     "type": "Type", "audience": "For", "price": "Monthly budget", "amenities": "Facilities", "food": "Food", "veg": "Veg only", "nonveg": "Non-veg available",
     "onlyFree": "Only places with free beds", "sort": "Sort", "sortRelevance": "Best match", "sortNearest": "Nearest", "sortPrice": "Price: low to high",
     "sortBeds": "Most beds free", "sortRecent": "Recently updated", "list": "List", "map": "Map", "clear": "Clear all", "apply": "Show results",
-    "empty": "No places match these filters yet.", "emptyHint": "Remove a filter or search a nearby area.", "loadMore": "Show more", "all": "All"
+    "emptyAll": "No places are listed here yet.", "emptyAllHint": "Owners are adding their hostels and messes. Check back soon.", "emptyAllCta": "Run a place? List it free", "empty": "No places match these filters yet.", "emptyHint": "Remove a filter or search a nearby area.", "loadMore": "Show more", "all": "All"
   },
   "place": {
     "overview": "Overview", "rooms": "Rooms & prices", "facilities": "Facilities", "food": "Food & menu", "rules": "Rules", "location": "Location", "photos": "Photos",
