@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { homeFor, type MyContext } from "@/features/auth/session"
+import { homeFor, type MyContext } from "@/features/auth/home"
 
 const place = (slug: string) => ({ tenant_id: slug, slug, name: slug, type: "hostel", status: "active" })
 const ctx = (p: Partial<MyContext>): MyContext => ({ user_id: "u", is_platform_admin: false, staff: [], memberships: [], ...p })
