@@ -1,10 +1,11 @@
-import { ArrowUpRight, Search } from "lucide-react"
+import { ArrowUpRight, Moon, Search, Sun } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Link, useLocation } from "react-router"
 import { Logo } from "@/components/befo/logo"
-import { LanguageToggle, ThemeToggle } from "@/components/layout/toggles"
+import { useTheme } from "@/app/theme"
+import { LanguageToggle } from "@/components/layout/toggles"
 import { cn } from "@/lib/utils"
 import { photo } from "./media"
 import { EASE } from "./reveal"
@@ -24,6 +25,8 @@ export function SiteNav() {
   const [open, setOpen] = useState(false)
   const loc = useLocation()
   const reduce = useReducedMotion()
+  const { resolved, theme, setTheme } = useTheme()
+  const dark = resolved === "dark"
   const panel = useRef<HTMLDivElement>(null)
   const [prevPath, setPrevPath] = useState(loc.pathname)
   if (prevPath !== loc.pathname) { setPrevPath(loc.pathname); setOpen(false) }
@@ -35,12 +38,19 @@ export function SiteNav() {
     window.addEventListener("pointerdown", onDown)
     return () => { window.removeEventListener("keydown", onKey); window.removeEventListener("pointerdown", onDown) }
   }, [open])
-  const circle = "flex size-14 items-center justify-center rounded-full border border-foreground/12 bg-background/70 backdrop-blur-md transition-colors duration-300 outline-none hover:bg-card focus-visible:ring-[3px] focus-visible:ring-ring/50"
+  const circle = "flex size-12 min-[380px]:size-14 items-center justify-center rounded-full border border-foreground/12 bg-background/70 backdrop-blur-md transition-colors duration-300 outline-none hover:bg-card focus-visible:ring-[3px] focus-visible:ring-ring/50"
   return (
     <header data-site-nav className="fixed inset-x-0 top-0 z-50" style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}>
       <div className="relative mx-auto flex max-w-[1200px] items-center justify-between px-4 sm:px-6">
-        <div className="flex h-14 items-center rounded-full border border-foreground/12 bg-background/70 px-6 backdrop-blur-md"><Logo /></div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex h-12 items-center rounded-full border border-foreground/12 bg-background/70 px-5 backdrop-blur-md min-[380px]:h-14 min-[380px]:px-6"><Logo /></div>
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <button type="button" onClick={() => setTheme(dark ? "light" : "dark")} className={circle}
+            aria-label={dark ? "Switch to light theme" : "Switch to dark theme"} title={dark ? "Light theme" : "Dark theme"}>
+            <span className="relative block size-5" aria-hidden>
+              <Sun className={cn("absolute inset-0 size-5 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]", dark ? "rotate-90 scale-50 opacity-0" : "rotate-0 scale-100 opacity-100")} strokeWidth={1.6} />
+              <Moon className={cn("absolute inset-0 size-5 transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)]", dark ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-50 opacity-0")} strokeWidth={1.6} />
+            </span>
+          </button>
           <Link to="/explore" className={circle} aria-label={t("nav.explore")}><Search className="size-[20px]" strokeWidth={1.6} /></Link>
           <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls="site-menu" aria-label={t("nav.menu")}
             className={cn(circle, open && "border-brand bg-brand text-white hover:bg-brand")}>
@@ -75,8 +85,14 @@ export function SiteNav() {
                 <span className="relative flex h-full items-center justify-center gap-2 text-[26px] font-medium text-white">Find a place <ArrowUpRight className="size-7 transition-transform duration-500 group-hover:rotate-45" strokeWidth={1.5} /></span>
               </Link>
               <div className="mt-3 flex items-center justify-between gap-2 px-1">
-                <Link to="/login" className="inline-flex h-11 items-center rounded-full px-4 text-[15px] font-medium hover:bg-muted">{t("nav.login")}</Link>
-                <div className="flex items-center"><LanguageToggle /><ThemeToggle /></div>
+                <Link to="/login" className="inline-flex h-11 items-center rounded-full px-4 text-[15px] font-medium whitespace-nowrap hover:bg-muted">{t("nav.login")}</Link>
+                <LanguageToggle />
+              </div>
+              <div role="radiogroup" aria-label="Theme" className="mt-2 grid grid-cols-3 rounded-full border border-foreground/12 p-1">
+                {(["light", "dark", "system"] as const).map((v) => (
+                  <button key={v} type="button" role="radio" aria-checked={theme === v} onClick={() => setTheme(v)}
+                    className={cn("h-10 rounded-full text-[14px] capitalize transition-colors", theme === v ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")}>{v}</button>
+                ))}
               </div>
             </motion.div>
           )}

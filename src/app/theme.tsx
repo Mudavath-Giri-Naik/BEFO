@@ -9,9 +9,9 @@ const Ctx = createContext<ThemeCtx | null>(null)
 function readStored(): Theme {
   try {
     const v = localStorage.getItem(KEY)
-    return v === "light" || v === "dark" || v === "system" ? v : "system"
+    return v === "light" || v === "dark" || v === "system" ? v : "light"
   } catch {
-    return "system"
+    return "light"
   }
 }
 const systemDark = () => typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -29,6 +29,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", resolved === "dark")
     document.documentElement.style.colorScheme = resolved
+    // keep the phone's browser bar in step with the chosen theme
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute("content", resolved === "dark" ? "#141414" : "#f1f1f0"))
   }, [resolved])
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t)
